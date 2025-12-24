@@ -27,17 +27,18 @@ CREATE TABLE subjects (
 );
 
 CREATE TABLE halls (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  hall_number TEXT UNIQUE NOT NULL,
+  id UUID PRIMARY KEY,
+  hall_number TEXT UNIQUE,
   total_benches INT NOT NULL,
   seats_per_bench INT NOT NULL,
   hall_order INT NOT NULL
 );
 
+
 CREATE TABLE students (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   roll_no TEXT UNIQUE NOT NULL,
-  name TEXT NOT NULL,
+  name  TEXT NOT NULL,
   department_id UUID REFERENCES departments(id),
   subject_code TEXT NOT NULL,
   exam_id UUID REFERENCES exams(id)

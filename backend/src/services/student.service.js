@@ -7,22 +7,36 @@ import { v4 as uuidv4 } from "uuid";
 export const createStudent = async (req, res) => {
   const {
     roll_no,
-    student_name,
+    name,
     department_id,
-    subject_code
+    subject_code,
+    exam_id
   } = req.body;
+
+  if (!roll_no || !name || !subject_code) {
+    return res.status(400).json({
+      error: "roll_no, name, subject_code are required"
+    });
+  }
 
   try {
     await pool.query(
       `
       INSERT INTO students
-      (id, roll_no, student_name, department_id, subject_code)
-      VALUES ($1, $2, $3, $4, $5)
+      (id, roll_no, name, department_id, subject_code, exam_id)
+      VALUES ($1, $2, $3, $4, $5, $6)
       `,
-      [uuidv4(), roll_no, student_name, department_id, subject_code]
+      [
+        uuidv4(),
+        roll_no,
+        name,
+        department_id || null,
+        subject_code,
+        exam_id || null
+      ]
     );
 
-    res.json({ message: "Student created" });
+    res.status(201).json({ message: "Student created" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -38,11 +52,12 @@ export const getStudents = async (req, res) => {
       SELECT
         s.id,
         s.roll_no,
-        s.student_name,
+        s.name,
         d.name AS department,
-        s.subject_code
+        s.subject_code,
+        s.exam_id
       FROM students s
-      JOIN departments d ON d.id = s.department_id
+      LEFT JOIN departments d ON d.id = s.department_id
       ORDER BY s.roll_no
       `
     );
@@ -57,6 +72,5 @@ export const getStudents = async (req, res) => {
  * Upload students (CSV logic placeholder)
  */
 export const uploadStudents = async (req, res) => {
-  // You can wire CSV later
   res.json({ message: "Upload endpoint ready" });
 };

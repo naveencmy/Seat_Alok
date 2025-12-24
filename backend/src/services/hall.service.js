@@ -7,8 +7,9 @@ export const createHall = async (req, res) => {
   try {
     await pool.query(
       `
-      INSERT INTO halls (id, hall_number, seat_capacity, hall_order)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO halls(id, hall_number, total_benches, seats_per_bench, hall_order)
+      VALUES ($1,$2,$3,$4,$5)
+
       `,
       [uuidv4(), hall_number, seat_capacity, hall_order]
     );
