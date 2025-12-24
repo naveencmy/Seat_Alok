@@ -1,0 +1,21 @@
+roll_no,student_name,department,subject_code
+CS001,John Doe,Computer Science,CS101
+CS002,Jane Smith,Computer Science,CS101
+CS003,Alice Johnson,Computer Science,CS102
+CS004,Bob Williams,Computer Science,CS101
+CS005,Charlie Brown,Computer Science,CS102
+ME001,David Lee,Mechanical Engineering,ME101
+ME002,Emma Wilson,Mechanical Engineering,ME101
+ME003,Frank Miller,Mechanical Engineering,ME102
+ME004,Grace Davis,Mechanical Engineering,ME101
+ME005,Henry Garcia,Mechanical Engineering,ME102
+EE001,Ivy Martinez,Electrical Engineering,EE101
+EE002,Jack Rodriguez,Electrical Engineering,EE101
+EE003,Kelly Hernandez,Electrical Engineering,EE102
+EE004,Liam Lopez,Electrical Engineering,EE101
+EE005,Mia Gonzalez,Electrical Engineering,EE102
+CE001,Noah Perez,Civil Engineering,CE101
+CE002,Olivia Wilson,Civil Engineering,CE101
+CE003,Peter Anderson,Civil Engineering,CE102
+CE004,Quinn Thomas,Civil Engineering,CE101
+CE005,Ruby Taylor,Civil Engineering,CE102

@@ -1,0 +1,358 @@
+================================================================================
+EXAM HALL SEAT ALLOCATION SYSTEM - DATABASE SETUP GUIDE
+================================================================================
+
+PROJECT ANALYSIS SUMMARY
+================================================================================
+
+1. DATABASE STRUCTURE
+   - Database Name: exam_seat_db
+   - Total Tables: 7
+   - PostgreSQL Version: 14+
+   - Character Set: UTF-8
+
+2. TABLES OVERVIEW
+   ✓ admins             - Admin user authentication
+   ✓ departments        - Academic departments
+   ✓ exams              - Exam information
+   ✓ subjects           - Subject details with exam linking
+   ✓ halls              - Exam hall details with capacity
+   ✓ students           - Student records
+   ✓ seat_allocations   - Seat assignment mapping
+
+3. KEY RELATIONSHIPS
+   - subjects -> exams (many-to-one)
+   - students -> departments (many-to-one)
+   - students -> subjects (many-to-one via subject_code)
+   - seat_allocations -> students (many-to-one)
+   - seat_allocations -> halls (many-to-one)
+   - seat_allocations -> exams (many-to-one)
+
+4. UNIQUE CONSTRAINTS
+   - Admin username must be unique
+   - Department name and code must be unique
+   - Subject code must be unique
+   - Hall number must be unique
+   - Student roll_no must be unique
+   - One seat per student per exam
+   - One student per seat per exam
+
+================================================================================
+DATABASE SETUP INSTRUCTIONS
+================================================================================
+
+METHOD 1: Using psql Command Line
+----------------------------------
+
+Step 1: Open PowerShell as Administrator
+
+Step 2: Connect to PostgreSQL
+   psql -U postgres
+
+Step 3: Create Database
+   CREATE DATABASE exam_seat_db;
+
+Step 4: Connect to Database
+   \c exam_seat_db
+
+Step 5: Run the SQL Script
+   \i 'e:/User_Profile Jagan/Documents/seat-all/backend/setup-database.sql'
+
+Step 6: Verify Tables
+   \dt
+
+
+METHOD 2: Using pgAdmin 4 (GUI)
+--------------------------------
+
+Step 1: Open pgAdmin 4
+
+Step 2: Connect to PostgreSQL Server
+   - Enter your postgres password
+
+Step 3: Create Database
+   - Right-click "Databases" → "Create" → "Database"
+   - Name: exam_seat_db
+   - Click "Save"
+
+Step 4: Open Query Tool
+   - Right-click "exam_seat_db" → "Query Tool"
+
+Step 5: Load and Execute SQL Script
+   - Click "Open File" icon
+   - Select: e:\User_Profile Jagan\Documents\seat-all\backend\setup-database.sql
+   - Click "Execute" (F5)
+
+Step 6: Verify Tables
+   - Refresh "exam_seat_db" → "Schemas" → "public" → "Tables"
+
+
+METHOD 3: Using Node.js Migration Script
+-----------------------------------------
+
+Step 1: Navigate to Backend Directory
+   cd "e:\User_Profile Jagan\Documents\seat-all\backend"
+
+Step 2: Ensure .env File Exists
+   - Copy .env.example to .env
+   - Edit DATABASE_URL with your credentials:
+     DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/exam_seat_db
+
+Step 3: Build TypeScript Code
+   npm run build
+
+Step 4: Run Migration
+   npm run db:migrate
+
+Step 5: Verify
+   - Check console output: "All tables created successfully"
+
+
+METHOD 4: One-Line PowerShell Command
+--------------------------------------
+
+psql -U postgres -c "CREATE DATABASE exam_seat_db;" ; psql -U postgres -d exam_seat_db -f "e:\User_Profile Jagan\Documents\seat-all\backend\setup-database.sql"
+
+================================================================================
+COMPLETE SQL SCRIPT (for manual execution)
+================================================================================
+
+-- Step 1: Create Database (if not exists)
+CREATE DATABASE exam_seat_db;
+
+-- Step 2: Connect to Database
+\c exam_seat_db
+
+-- Step 3: Create Tables
+
+-- Admins Table
+CREATE TABLE admins (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Departments Table
+CREATE TABLE departments (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    code VARCHAR(50) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Exams Table
+CREATE TABLE exams (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    exam_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Subjects Table
+CREATE TABLE subjects (
+    id SERIAL PRIMARY KEY,
+    subject_code VARCHAR(50) UNIQUE NOT NULL,
+    subject_name VARCHAR(255) NOT NULL,
+    credits INTEGER,
+    exam_id INTEGER REFERENCES exams(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Halls Table
+CREATE TABLE halls (
+    id SERIAL PRIMARY KEY,
+    hall_number VARCHAR(100) UNIQUE NOT NULL,
+    seat_capacity INTEGER NOT NULL,
+    hall_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Students Table
+CREATE TABLE students (
+    id SERIAL PRIMARY KEY,
+    roll_no VARCHAR(100) UNIQUE NOT NULL,
+    student_name VARCHAR(255) NOT NULL,
+    department_id INTEGER REFERENCES departments(id) ON DELETE SET NULL,
+    subject_code VARCHAR(50) REFERENCES subjects(subject_code) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Seat Allocations Table
+CREATE TABLE seat_allocations (
+    id SERIAL PRIMARY KEY,
+    student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
+    hall_id INTEGER REFERENCES halls(id) ON DELETE CASCADE,
+    seat_number INTEGER NOT NULL,
+    exam_id INTEGER REFERENCES exams(id) ON DELETE CASCADE,
+    allocated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(hall_id, seat_number, exam_id),
+    UNIQUE(student_id, exam_id)
+);
+
+-- Step 4: Create Indexes for Performance
+CREATE INDEX idx_students_roll_no ON students(roll_no);
+CREATE INDEX idx_students_department ON students(department_id);
+CREATE INDEX idx_students_subject ON students(subject_code);
+CREATE INDEX idx_subjects_exam ON subjects(exam_id);
+CREATE INDEX idx_seat_allocations_student ON seat_allocations(student_id);
+CREATE INDEX idx_seat_allocations_hall ON seat_allocations(hall_id);
+CREATE INDEX idx_seat_allocations_exam ON seat_allocations(exam_id);
+
+================================================================================
+VERIFICATION QUERIES
+================================================================================
+
+-- Check if all tables exist
+SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+ORDER BY table_name;
+
+-- Check table structures
+\d admins
+\d departments
+\d exams
+\d subjects
+\d halls
+\d students
+\d seat_allocations
+
+-- Count records in each table
+SELECT 'admins' as table_name, COUNT(*) as count FROM admins
+UNION ALL
+SELECT 'departments', COUNT(*) FROM departments
+UNION ALL
+SELECT 'exams', COUNT(*) FROM exams
+UNION ALL
+SELECT 'subjects', COUNT(*) FROM subjects
+UNION ALL
+SELECT 'halls', COUNT(*) FROM halls
+UNION ALL
+SELECT 'students', COUNT(*) FROM students
+UNION ALL
+SELECT 'seat_allocations', COUNT(*) FROM seat_allocations;
+
+================================================================================
+SAMPLE DATA INSERTION (Optional)
+================================================================================
+
+-- Insert Sample Admin (password: admin123, hashed with bcrypt)
+INSERT INTO admins (username, password) 
+VALUES ('admin', '$2a$10$YourHashedPasswordHere');
+
+-- Insert Sample Departments
+INSERT INTO departments (name, code) VALUES 
+('Computer Science', 'CS'),
+('Mechanical Engineering', 'ME'),
+('Electrical Engineering', 'EE'),
+('Civil Engineering', 'CE');
+
+-- Insert Sample Exam
+INSERT INTO exams (name, exam_date) 
+VALUES ('Mid Semester Exam 2024', '2024-12-15');
+
+-- Insert Sample Subjects
+INSERT INTO subjects (subject_code, subject_name, credits, exam_id) VALUES 
+('CS101', 'Introduction to Programming', 4, 1),
+('CS102', 'Data Structures', 4, 1),
+('ME101', 'Engineering Mechanics', 4, 1),
+('EE101', 'Circuit Theory', 4, 1);
+
+-- Insert Sample Halls
+INSERT INTO halls (hall_number, seat_capacity, hall_order) VALUES 
+('Hall A', 30, 1),
+('Hall B', 25, 2),
+('Hall C', 20, 3);
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+ERROR: "database exam_seat_db does not exist"
+SOLUTION: Run: CREATE DATABASE exam_seat_db;
+
+ERROR: "permission denied"
+SOLUTION: Run psql as postgres superuser: psql -U postgres
+
+ERROR: "role postgres does not exist"
+SOLUTION: Use your PostgreSQL username instead of postgres
+
+ERROR: "could not connect to server"
+SOLUTION: Ensure PostgreSQL service is running:
+   Get-Service -Name "postgresql*"
+   Start-Service -Name "postgresql-x64-14"
+
+ERROR: "relation already exists"
+SOLUTION: Drop existing tables first (see setup-database.sql)
+
+ERROR: Tables created but application can't connect
+SOLUTION: Check .env file DATABASE_URL matches your credentials
+
+================================================================================
+DATABASE CONNECTION STRINGS
+================================================================================
+
+Node.js (pg library):
+postgresql://postgres:password@localhost:5432/exam_seat_db
+
+Connection String Format:
+postgresql://[username]:[password]@[host]:[port]/[database]
+
+Example .env file:
+PORT=5000
+DATABASE_URL=postgresql://postgres:yourpassword@localhost:5432/exam_seat_db
+JWT_SECRET=your_secret_key_here
+NODE_ENV=development
+
+================================================================================
+NEXT STEPS AFTER DATABASE SETUP
+================================================================================
+
+1. ✓ Database created
+2. ✓ Tables created
+3. → Create admin user via API:
+      POST http://localhost:5000/api/auth/register
+      Body: {"username":"admin","password":"admin123"}
+
+4. → Login to application:
+      http://localhost:3000
+      Username: admin
+      Password: admin123
+
+5. → Add initial data:
+      - Departments
+      - Exams
+      - Subjects
+      - Halls
+
+6. → Upload students via CSV
+
+7. → Generate seat allocation
+
+8. → View and export seating plans
+
+================================================================================
+BACKUP AND RESTORE
+================================================================================
+
+Backup Database:
+pg_dump -U postgres exam_seat_db > backup.sql
+
+Restore Database:
+psql -U postgres exam_seat_db < backup.sql
+
+Export to CSV:
+\copy (SELECT * FROM students) TO 'students.csv' CSV HEADER
+
+================================================================================
+
+For more information, see:
+- README.md - Complete documentation
+- INSTALLATION_GUIDE.md - Detailed setup guide
+- API_TESTING.md - API endpoint reference
+
+Database setup script location:
+e:\User_Profile Jagan\Documents\seat-all\backend\setup-database.sql
+
+================================================================================
