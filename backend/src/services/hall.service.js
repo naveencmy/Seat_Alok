@@ -2,14 +2,12 @@ import pool from "../config/db.js";
 import { v4 as uuidv4 } from "uuid";
 
 export const createHall = async (req, res) => {
-  const { hall_number, seat_capacity, hall_order } = req.body;
-
+const { hall_number, total_benches, seats_per_bench, hall_order } = req.body;
   try {
     await pool.query(
       `
-      INSERT INTO halls(id, hall_number, total_benches, seats_per_bench, hall_order)
+      INSERT INTO halls(id,hall_number,total_benches,seats_per_bench,hall_order)
       VALUES ($1,$2,$3,$4,$5)
-
       `,
       [uuidv4(), hall_number, seat_capacity, hall_order]
     );

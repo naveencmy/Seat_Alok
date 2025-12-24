@@ -1,5 +1,8 @@
 import pool from "../config/db.js";
 
+/**
+ * Get full seating for an exam (hall-wise, ordered)
+ */
 export const getSeatingByExam = async (req, res) => {
   const { examId } = req.params;
 
@@ -8,17 +11,18 @@ export const getSeatingByExam = async (req, res) => {
       `
       SELECT
         h.hall_number,
-        sa.seat_number,
+        sa.bench_no,
+        sa.seat_position,
         s.roll_no,
-        s.student_name,
+        s.name AS student_name,
         d.code AS department,
         s.subject_code
       FROM seat_allocations sa
       JOIN students s ON s.id = sa.student_id
+      LEFT JOIN departments d ON d.id = s.department_id
       JOIN halls h ON h.id = sa.hall_id
-      JOIN departments d ON d.id = s.department_id
       WHERE sa.exam_id = $1
-      ORDER BY h.hall_order, sa.seat_number
+      ORDER BY h.hall_order, sa.bench_no, sa.seat_position
       `,
       [examId]
     );
@@ -29,6 +33,9 @@ export const getSeatingByExam = async (req, res) => {
   }
 };
 
+/**
+ * Get seating for a specific hall in an exam
+ */
 export const getSeatingByHall = async (req, res) => {
   const { hallId, examId } = req.params;
 
@@ -36,17 +43,18 @@ export const getSeatingByHall = async (req, res) => {
     const result = await pool.query(
       `
       SELECT
-        sa.seat_number,
+        sa.bench_no,
+        sa.seat_position,
         s.roll_no,
-        s.student_name,
+        s.name AS student_name,
         d.code AS department,
         s.subject_code
       FROM seat_allocations sa
       JOIN students s ON s.id = sa.student_id
-      JOIN departments d ON d.id = s.department_id
+      LEFT JOIN departments d ON d.id = s.department_id
       WHERE sa.exam_id = $1
         AND sa.hall_id = $2
-      ORDER BY sa.seat_number
+      ORDER BY sa.bench_no, sa.seat_position
       `,
       [examId, hallId]
     );
@@ -57,6 +65,9 @@ export const getSeatingByHall = async (req, res) => {
   }
 };
 
+/**
+ * Get seat for a single student
+ */
 export const getStudentSeat = async (req, res) => {
   const { rollNo, examId } = req.params;
 
@@ -65,7 +76,8 @@ export const getStudentSeat = async (req, res) => {
       `
       SELECT
         h.hall_number,
-        sa.seat_number
+        sa.bench_no,
+        sa.seat_position
       FROM seat_allocations sa
       JOIN students s ON s.id = sa.student_id
       JOIN halls h ON h.id = sa.hall_id

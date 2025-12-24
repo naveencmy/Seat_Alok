@@ -1,0 +1,6188 @@
+Directory structure:
+└── naveencmy-seat_alok/
+    ├── README.md
+    ├── API_TESTING.md
+    ├── ARCHITECTURE.md
+    ├── db.txt
+    ├── DOCUMENTATION_INDEX.md
+    ├── FILE_STRUCTURE.md
+    ├── INSTALLATION_GUIDE.md
+    ├── PROJECT_SUMMARY.md
+    ├── quick-start.ps1
+    ├── sample-students.csv
+    ├── backend/
+    │   ├── README.md
+    │   ├── ,nvmrc
+    │   ├── nodemon.json
+    │   ├── package.json
+    │   └── src/
+    │       ├── app.js
+    │       ├── server.js
+    │       ├── config/
+    │       │   ├── db.js
+    │       │   └── test-db.js
+    │       ├── database/
+    │       │   ├── migrate.js
+    │       │   └── schema.sql
+    │       ├── middleware/
+    │       │   └── auth.middleware.js
+    │       ├── routes/
+    │       │   ├── allocation.routes.js
+    │       │   ├── auth.routes.js
+    │       │   ├── department.routes.js
+    │       │   ├── exam.routes.js
+    │       │   ├── hall.routes.js
+    │       │   ├── seating.routes.js
+    │       │   ├── student.routes.js
+    │       │   └── subject.routes.js
+    │       └── services/
+    │           ├── allocation.service.js
+    │           ├── auth.service.js
+    │           ├── department.service.js
+    │           ├── exam.service.js
+    │           ├── hall.service.js
+    │           ├── seating.service.js
+    │           ├── student.service.js
+    │           └── subject.service.js
+    └── frontend/
+        ├── index.html
+        ├── package.json
+        ├── tsconfig.json
+        ├── tsconfig.node.json
+        ├── vite.config.ts
+        └── src/
+            ├── App.css
+            ├── App.tsx
+            ├── main.tsx
+            ├── vite-env.d.ts
+            ├── pages/
+            │   ├── Allocation.tsx
+            │   ├── Dashboard.tsx
+            │   ├── Departments.tsx
+            │   ├── Exams.tsx
+            │   ├── Halls.tsx
+            │   ├── Login.tsx
+            │   ├── Seating.tsx
+            │   ├── Students.tsx
+            │   └── Subjects.tsx
+            └── services/
+                └── api.ts
+
+================================================
+FILE: README.md
+================================================
+# Exam Hall Seat Allocation System
+
+A complete web application for managing exam hall seat allocation with automatic seating algorithm, built with React + TypeScript (frontend) and Express.js + TypeScript (backend) with PostgreSQL database.
+
+## Features
+
+### 1. Admin Module
+
+- JWT-based authentication
+- Secure admin login
+- Dashboard with statistics
+
+### 2. Exam Management
+
+- Add, edit, delete exams
+- Set exam name and date
+- View all exams
+
+### 3. Subject Management
+
+- Add subjects with code, name, and credits
+- Link subjects to exams
+- Edit and delete subjects
+
+### 4. Hall Management
+
+- Add halls with number and seat capacity
+- Set hall order for allocation sequence
+- Edit and delete halls
+
+### 5. Department Management
+
+- Add and manage departments
+- Department code and name
+
+### 6. Student Dataset Upload
+
+- Upload students via CSV/Excel files
+- Required columns: `roll_no, student_name, department, subject_code`
+- Auto-create departments if not exist
+- Validate subjects before upload
+- Upsert duplicate students (update on conflict)
+
+### 7. Automatic Seating Allocation
+
+- Fill halls hall-by-hall, seat-by-seat
+- Seat numbering starts from 1 to capacity
+- Unique seat assignment per student
+- Sequential hall allocation based on hall_order
+- Clear and regenerate allocations
+
+### 8. Seating Display
+
+- Hall-wise seating view with all students
+- Student seat lookup by roll number
+- View all allocations for an exam
+
+### 9. Export Features
+
+- Export seating plan to Excel (.xlsx)
+- Export seating plan to PDF (.pdf)
+
+## Technology Stack
+
+### Backend
+
+- Node.js with Express.js
+- TypeScript
+- PostgreSQL
+- JWT for authentication
+- Multer for file uploads
+- ExcelJS for Excel export
+- PDFKit for PDF export
+- XLSX for parsing CSV/Excel
+
+### Frontend
+
+- React 18
+- TypeScript
+- Vite
+- React Router DOM
+- Axios for API calls
+- React Toastify for notifications
+
+## Folder Structure
+
+```
+seat-all/
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── database.ts
+│   │   ├── database/
+│   │   │   ├── schema.ts
+│   │   │   └── migrate.ts
+│   │   ├── middleware/
+│   │   │   └── auth.ts
+│   │   ├── routes/
+│   │   │   ├── auth.ts
+│   │   │   ├── exams.ts
+│   │   │   ├── subjects.ts
+│   │   │   ├── halls.ts
+│   │   │   ├── departments.ts
+│   │   │   ├── students.ts
+│   │   │   ├── allocation.ts
+│   │   │   ├── seating.ts
+│   │   │   └── export.ts
+│   │   └── server.ts
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── .env
+├── frontend/
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── Login.tsx
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── Exams.tsx
+│   │   │   ├── Subjects.tsx
+│   │   │   ├── Halls.tsx
+│   │   │   ├── Departments.tsx
+│   │   │   ├── Students.tsx
+│   │   │   ├── Allocation.tsx
+│   │   │   └── Seating.tsx
+│   │   ├── services/
+│   │   │   └── api.ts
+│   │   ├── App.tsx
+│   │   ├── App.css
+│   │   └── main.tsx
+│   ├── package.json
+│   ├── vite.config.ts
+│   └── tsconfig.json
+└── README.md
+```
+
+## Prerequisites
+
+- Node.js (v18 or higher)
+- PostgreSQL (v14 or higher)
+- npm or yarn
+
+## Installation & Setup
+
+### 1. Database Setup
+
+First, install PostgreSQL and create a database:
+
+```sql
+-- Connect to PostgreSQL
+psql -U postgres
+
+-- Create database
+CREATE DATABASE exam_seat_db;
+
+-- Exit psql
+\q
+```
+
+### 2. Backend Setup
+
+```powershell
+# Navigate to backend directory
+cd backend
+
+# Install dependencies
+npm install
+
+# Create .env file
+Copy-Item .env.example .env
+
+# Edit .env file with your database credentials
+# Update the following in .env:
+# DATABASE_URL=postgresql://postgres:your_password@localhost:5432/exam_seat_db
+# JWT_SECRET=your_secret_key_change_this
+
+# Run database migrations
+npm run build
+npm run db:migrate
+
+# Create uploads directory for file uploads
+mkdir uploads
+
+# Start the development server
+npm run dev
+```
+
+The backend server will start on `http://localhost:5000`
+
+### 3. Frontend Setup
+
+Open a new terminal:
+
+```powershell
+# Navigate to frontend directory
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+The frontend will start on `http://localhost:3000`
+
+## Initial Setup
+
+### 1. Create Admin User
+
+Before you can log in, create an admin user:
+
+```powershell
+# Using curl or any API client, send a POST request to create admin
+curl -X POST http://localhost:5000/api/auth/register `
+  -H "Content-Type: application/json" `
+  -d '{"username":"admin","password":"admin123"}'
+```
+
+Or use Postman/Thunder Client:
+
+- URL: `POST http://localhost:5000/api/auth/register`
+- Body (JSON):
+
+```json
+{
+  "username": "admin",
+  "password": "admin123"
+}
+```
+
+### 2. Login
+
+Open `http://localhost:3000` in your browser and login with:
+
+- Username: `admin`
+- Password: `admin123`
+
+## Usage Guide
+
+### Step 1: Add Departments
+
+1. Navigate to "Departments" from the navbar
+2. Click "Add New Department"
+3. Enter department name and code
+4. Click "Create"
+
+### Step 2: Add Exams
+
+1. Navigate to "Exams"
+2. Click "Add New Exam"
+3. Enter exam name and date
+4. Click "Create"
+
+### Step 3: Add Subjects
+
+1. Navigate to "Subjects"
+2. Click "Add New Subject"
+3. Enter subject code, name, credits
+4. Optionally link to an exam
+5. Click "Create"
+
+### Step 4: Add Halls
+
+1. Navigate to "Halls"
+2. Click "Add New Hall"
+3. Enter hall number, seat capacity, and order
+4. Click "Create"
+
+**Note:** Hall order determines the sequence of allocation. Lower order halls are filled first.
+
+### Step 5: Upload Students
+
+1. Navigate to "Students"
+2. Prepare a CSV/Excel file with columns: `roll_no, student_name, department, subject_code`
+
+Example CSV:
+
+```csv
+roll_no,student_name,department,subject_code
+CS001,John Doe,Computer Science,CS101
+CS002,Jane Smith,Computer Science,CS101
+ME001,Bob Johnson,Mechanical,ME101
+```
+
+3. Click "Choose File" and select your file
+4. Click "Upload Students"
+
+### Step 6: Generate Seat Allocation
+
+1. Navigate to "Allocation"
+2. Select an exam from the dropdown
+3. Review the statistics (total students, allocated, unallocated)
+4. Click "Generate Allocation"
+5. The system will automatically allocate seats following the rules
+
+### Step 7: View Seating Arrangements
+
+1. Navigate to "Seating"
+2. Select an exam
+3. View hall-wise seating or search for specific student
+4. Export to Excel or PDF
+
+## API Endpoints
+
+### Authentication
+
+- `POST /api/auth/register` - Create admin
+- `POST /api/auth/login` - Admin login
+
+### Exams
+
+- `GET /api/exams` - List all exams
+- `GET /api/exams/:id` - Get single exam
+- `POST /api/exams` - Create exam
+- `PUT /api/exams/:id` - Update exam
+- `DELETE /api/exams/:id` - Delete exam
+
+### Subjects
+
+- `GET /api/subjects` - List all subjects
+- `GET /api/subjects/:id` - Get single subject
+- `POST /api/subjects` - Create subject
+- `PUT /api/subjects/:id` - Update subject
+- `DELETE /api/subjects/:id` - Delete subject
+
+### Halls
+
+- `GET /api/halls` - List all halls
+- `GET /api/halls/:id` - Get single hall
+- `POST /api/halls` - Create hall
+- `PUT /api/halls/:id` - Update hall
+- `DELETE /api/halls/:id` - Delete hall
+
+### Departments
+
+- `GET /api/departments` - List all departments
+- `POST /api/departments` - Create department
+- `PUT /api/departments/:id` - Update department
+- `DELETE /api/departments/:id` - Delete department
+
+### Students
+
+- `GET /api/students` - List all students
+- `POST /api/students/upload` - Upload students CSV/Excel
+- `DELETE /api/students/:id` - Delete student
+
+### Allocation
+
+- `POST /api/allocation/generate` - Generate seat allocation
+- `GET /api/allocation/status/:exam_id` - Get allocation status
+- `DELETE /api/allocation/clear/:exam_id` - Clear allocations
+
+### Seating
+
+- `GET /api/seating/hall/:hall_id/:exam_id` - Hall-wise seating
+- `GET /api/seating/student/:roll_no/:exam_id` - Student seat lookup
+- `GET /api/seating/exam/:exam_id` - All allocations for exam
+- `GET /api/seating/halls/:exam_id` - Halls with allocation counts
+
+### Export
+
+- `GET /api/export/excel/:exam_id` - Export to Excel
+- `GET /api/export/pdf/:exam_id` - Export to PDF
+
+## Allocation Algorithm
+
+The automatic seating allocation follows these rules:
+
+1. **Sequential Hall Filling**: Halls are filled in order based on `hall_order` field
+2. **Seat-by-Seat**: Within each hall, seats are filled sequentially from 1 to capacity
+3. **Unique Assignment**: Each student gets exactly one seat per exam
+4. **No Conflicts**: A seat can only be assigned to one student per exam
+5. **Overflow Handling**: If all halls are full, remaining students are marked as unallocated
+
+## Database Schema
+
+### Tables
+
+- `admins` - Admin users
+- `departments` - Academic departments
+- `exams` - Exam information
+- `subjects` - Subject details
+- `halls` - Exam halls
+- `students` - Student records
+- `seat_allocations` - Seat allocation mapping
+
+## Production Deployment
+
+### Backend
+
+1. Build the TypeScript code: `npm run build`
+2. Set environment variables in production
+3. Run migrations: `npm run db:migrate`
+4. Start server: `npm start`
+
+### Frontend
+
+1. Build for production: `npm run build`
+2. Serve the `dist` folder using nginx or any static server
+
+### Environment Variables (Production)
+
+```env
+PORT=5000
+DATABASE_URL=postgresql://user:password@host:5432/database
+JWT_SECRET=your_strong_secret_key_change_this
+NODE_ENV=production
+```
+
+## Security Notes
+
+1. **Change JWT Secret**: Update `JWT_SECRET` in `.env` to a strong random string
+2. **Database Password**: Use a strong password for PostgreSQL
+3. **HTTPS**: Use HTTPS in production
+4. **CORS**: Configure CORS properly for production domains
+5. **Rate Limiting**: Add rate limiting middleware in production
+6. **Remove Register Endpoint**: Comment out `/api/auth/register` after creating admin user
+
+## Troubleshooting
+
+### Backend won't start
+
+- Check if PostgreSQL is running
+- Verify database credentials in `.env`
+- Check if port 5000 is available
+
+### Frontend won't connect to backend
+
+- Ensure backend is running on port 5000
+- Check proxy configuration in `vite.config.ts`
+- Verify CORS settings in backend
+
+### Upload fails
+
+- Check if `uploads` directory exists in backend
+- Verify file format (CSV/Excel)
+- Ensure all required columns are present
+
+### Allocation errors
+
+- Ensure halls exist before allocation
+- Verify students have been uploaded
+- Check that exam exists
+
+## Support
+
+For issues or questions, please check:
+
+1. Database connection is working
+2. All required services are running
+3. Environment variables are set correctly
+4. File permissions for uploads directory
+
+## License
+
+This project is for educational purposes.
+# Seat_Alok
+# Seat_Alok
+# Seat_Alok
+# Seat_Alok
+
+
+
+================================================
+FILE: API_TESTING.md
+================================================
+# API Testing Collection for Exam Seat Allocation
+
+## Base URL
+
+```
+http://localhost:5000/api
+```
+
+## 1. Create Admin (First Time Only)
+
+```http
+POST /auth/register
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+```
+
+## 2. Login
+
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+```
+
+Response:
+
+```json
+{
+  "message": "Login successful",
+  "token": "eyJhbGc...",
+  "admin": {
+    "id": 1,
+    "username": "admin"
+  }
+}
+```
+
+**Note:** Use the token in Authorization header for all subsequent requests:
+
+```
+Authorization: Bearer eyJhbGc...
+```
+
+## 3. Create Departments
+
+```http
+POST /departments
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "Computer Science",
+  "code": "CS"
+}
+```
+
+```http
+POST /departments
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "Mechanical Engineering",
+  "code": "ME"
+}
+```
+
+## 4. Create Exam
+
+```http
+POST /exams
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "Mid Semester Exam 2024",
+  "exam_date": "2024-12-15"
+}
+```
+
+## 5. Create Subjects
+
+```http
+POST /subjects
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "subject_code": "CS101",
+  "subject_name": "Introduction to Programming",
+  "credits": 4,
+  "exam_id": 1
+}
+```
+
+```http
+POST /subjects
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "subject_code": "CS102",
+  "subject_name": "Data Structures",
+  "credits": 4,
+  "exam_id": 1
+}
+```
+
+```http
+POST /subjects
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "subject_code": "ME101",
+  "subject_name": "Engineering Mechanics",
+  "credits": 4,
+  "exam_id": 1
+}
+```
+
+## 6. Create Halls
+
+```http
+POST /halls
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "hall_number": "Hall A",
+  "seat_capacity": 30,
+  "hall_order": 1
+}
+```
+
+```http
+POST /halls
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "hall_number": "Hall B",
+  "seat_capacity": 25,
+  "hall_order": 2
+}
+```
+
+```http
+POST /halls
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "hall_number": "Hall C",
+  "seat_capacity": 20,
+  "hall_order": 3
+}
+```
+
+## 7. Upload Students (Multipart Form)
+
+```http
+POST /students/upload
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+file: [Select sample-students.csv]
+```
+
+## 8. Generate Seat Allocation
+
+```http
+POST /allocation/generate
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "exam_id": 1
+}
+```
+
+## 9. Get Allocation Status
+
+```http
+GET /allocation/status/1
+Authorization: Bearer <token>
+```
+
+## 10. View Hall Seating
+
+```http
+GET /seating/hall/1/1
+Authorization: Bearer <token>
+```
+
+## 11. Search Student Seat
+
+```http
+GET /seating/student/CS001/1
+Authorization: Bearer <token>
+```
+
+## 12. Get All Allocations for Exam
+
+```http
+GET /seating/exam/1
+Authorization: Bearer <token>
+```
+
+## 13. Export to Excel
+
+```http
+GET /export/excel/1
+Authorization: Bearer <token>
+```
+
+Download the Excel file.
+
+## 14. Export to PDF
+
+```http
+GET /export/pdf/1
+Authorization: Bearer <token>
+```
+
+Download the PDF file.
+
+## 15. Get All Resources
+
+### List Exams
+
+```http
+GET /exams
+Authorization: Bearer <token>
+```
+
+### List Subjects
+
+```http
+GET /subjects
+Authorization: Bearer <token>
+```
+
+### List Halls
+
+```http
+GET /halls
+Authorization: Bearer <token>
+```
+
+### List Departments
+
+```http
+GET /departments
+Authorization: Bearer <token>
+```
+
+### List Students
+
+```http
+GET /students
+Authorization: Bearer <token>
+```
+
+## Quick Test Sequence
+
+1. Register admin
+2. Login and get token
+3. Create 2-3 departments
+4. Create an exam
+5. Create 3-4 subjects linked to the exam
+6. Create 2-3 halls with different capacities
+7. Upload the sample CSV file with students
+8. Generate allocation for the exam
+9. View hall-wise seating
+10. Search for a specific student
+11. Export to Excel/PDF
+
+## Notes
+
+- All routes except `/auth/login` and `/auth/register` require authentication
+- Use the token from login response in Authorization header
+- Hall order determines allocation sequence (lower order fills first)
+- Students are allocated sequentially based on roll number
+- Each student can only have one seat per exam
+- Sample CSV file is provided: `sample-students.csv`
+
+
+
+================================================
+FILE: ARCHITECTURE.md
+================================================
+# 🎨 System Architecture & Visual Overview
+# Exam Relation Has been in this format will have:
+Exam
+ ├── Exam_Sessions (CAT / EndSem)
+ │    ├── Subjects
+ │    │    ├── Departments
+ │    │    │    ├── Students
+ │
+Halls
+ └── Seats
+      └── Seat_Allocations (per exam session)
+
+
+## System Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         USER (Admin)                            │
+│                     Web Browser                                 │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    FRONTEND (React + TypeScript)                │
+│                      http://localhost:3000                      │
+├─────────────────────────────────────────────────────────────────┤
+│  Pages:                                                         │
+│  • Login          • Dashboard      • Exams                      │
+│  • Subjects       • Halls          • Departments                │
+│  • Students       • Allocation     • Seating                    │
+│                                                                 │
+│  Services:                                                      │
+│  • API Client (Axios)                                           │
+│  • JWT Token Management                                         │
+│  • React Router                                                 │
+└────────────────────────────┬────────────────────────────────────┘
+                             │ HTTP/HTTPS
+                             │ REST API Calls
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                  BACKEND (Express.js + TypeScript)              │
+│                      http://localhost:5000                      │
+├─────────────────────────────────────────────────────────────────┤
+│  Middleware:                                                    │
+│  • JWT Authentication                                           │
+│  • CORS                                                         │
+│  • Body Parser                                                  │
+│  • Multer (File Upload)                                         │
+│                                                                 │
+│  Routes/Controllers:                                            │
+│  • /api/auth          - Login & Register                        │
+│  • /api/exams         - Exam CRUD                               │
+│  • /api/subjects      - Subject CRUD                            │
+│  • /api/halls         - Hall CRUD                               │
+│  • /api/departments   - Department CRUD                         │
+│  • /api/students      - Student Upload & Management             │
+│  • /api/allocation    - Automatic Seating Algorithm             │
+│  • /api/seating       - Seating Display & Lookup                │
+│  • /api/export        - Excel & PDF Export                      │
+│                                                                 │
+│  Services:                                                      │
+│  • Allocation Engine  - Core Algorithm                          │
+│  • File Parser        - CSV/Excel Processing                    │
+│  • Export Generator   - Excel/PDF Creation                      │
+└────────────────────────────┬────────────────────────────────────┘
+                             │ SQL Queries
+                             │ (pg driver)
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   DATABASE (PostgreSQL)                         │
+│                         exam_seat_db                            │
+├─────────────────────────────────────────────────────────────────┤
+│  Tables:                                                        │
+│  • admins             - Admin users                             │
+│  • departments        - Academic departments                    │
+│  • exams              - Exam information                        │
+│  • subjects           - Subject details                         │
+│  • halls              - Exam halls                              │
+│  • students           - Student records                         │
+│  • seat_allocations   - Seat assignments                        │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Data Flow Diagrams
+
+### 1. Authentication Flow
+
+```
+┌──────┐         ┌──────────┐         ┌─────────┐              ┌──────────┐
+│User  │─Login──▶│Frontend  │─POST────▶│Backend  │─Query──▶  │Database   │
+│      │         │(React)   │         │(Express)│              │(Postgres) │
+│      │◀─Token──│          │◀─JWT────│         │◀─User───    │          │
+└──────┘         └──────────┘         └─────────┘              └──────────┘
+                      │
+                      │ Store Token
+                      │ in localStorage
+                      ▼
+              All API Requests
+              include Bearer Token
+```
+
+### 2. Student Upload Flow
+
+```
+┌──────┐           ┌──────────┐          ┌─────────┐           ┌──────────┐
+│Admin │─Upload──▶ │Frontend  │─POST────▶│Backend   │         │Database  │
+│      │ CSV/Excel │          │ File    │            │         │          │
+│      │           │          │         │            │         │          │
+│      │           │          │         │    ┌───────▼─────────▼─────┐    │
+│      │           │          │         │    │ Parse File            │    │
+│      │           │          │         │    │ • Read rows           │    │
+│      │           │          │         │    │ • Validate data       │    │
+│      │           │          │         │    └───────┬───────────────┘    │
+│      │           │          │         │            │                    │
+│      │           │          │         │    ┌───────▼───────────────┐    │
+│      │           │          │         │    │ Process Each Row      │    │
+│      │           │          │         │    │ • Check department    │◀───┤
+│      │           │          │         │    │ • Create if missing   │───▶│
+│      │           │          │         │    │ • Validate subject    │◀───┤
+│      │           │          │         │    │ • Upsert student      │───▶│
+│      │           │          │         │    └───────┬───────────────┘     │
+│      │           │          │         │            │                     │
+│      │◀─Result ─│          │◀────────│◀────────┘                       |
+│      │ Success   │          │ Report  │                                  │
+│      │ Count     |          │         │                                  │
+└──────┘           └──────────┘         └─────────┘             └──────────┘
+```
+
+### 3. Seat Allocation Algorithm Flow
+
+```
+┌──────┐         ┌──────────┐         ┌─────────┐         ┌──────────┐
+│Admin │─Generate▶│Frontend  │─POST────▶│Backend  │─Query──▶│Database  │
+│      │Allocation│          │ exam_id │         │ Halls   │          │
+│      │         │          │         │         │◀────────│          │
+│      │         │          │         │         │─Query──▶│          │
+│      │         │          │         │         │ Students│          │
+│      │         │          │         │         │◀────────│          │
+│      │         │          │         │         │         │          │
+│      │         │          │         │ ┌───────▼─────────┐          │
+│      │         │          │         │ │ALLOCATION ENGINE│          │
+│      │         │          │         │ │                 │          │
+│      │         │          │         │ │ FOR each hall   │          │
+│      │         │          │         │ │   in order:     │          │
+│      │         │          │         │ │                 │          │
+│      │         │          │         │ │   FOR seat 1 to │          │
+│      │         │          │         │ │   capacity:     │          │
+│      │         │          │         │ │                 │          │
+│      │         │          │         │ │     Assign next │          │
+│      │         │          │         │ │     student     │─────────▶│
+│      │         │          │         │ │                 │ INSERT   │
+│      │         │          │         │ │     Create      │ allocation│
+│      │         │          │         │ │     record      │          │
+│      │         │          │         │ │                 │          │
+│      │         │          │         │ │   END FOR       │          │
+│      │         │          │         │ │ END FOR         │          │
+│      │         │          │         │ └─────────────────┘          │
+│      │         │          │         │         │                    │
+│      │◀────────│◀─────────│◀────────│◀────────┘                   │
+│      │ Result  │ Display  │ Stats   │ Return counts                │
+│      │         │ Stats    │         │                             │
+└──────┘         └──────────┘         └─────────┘         └──────────┘
+```
+
+### 4. Seating Display Flow
+
+```
+┌──────┐         ┌──────────┐         ┌─────────┐         ┌──────────┐
+│User  │─Select──▶│Frontend  │─GET─────▶│Backend  │─Query──▶│Database  │
+│      │ Hall +   │          │ hall_id │         │ JOIN    │          │
+│      │ Exam     │          │ exam_id │         │ students│          │
+│      │         │          │         │         │ halls   │          │
+│      │         │          │         │         │ subjects│          │
+│      │         │          │         │         │◀────────│          │
+│      │◀────────│◀─────────│◀────────│◀────────┘                   │
+│      │ Display │ Table    │ JSON    │ Formatted                    │
+│      │ Seating │          │         │ Data                        │
+└──────┘         └──────────┘         └─────────┘         └──────────┘
+```
+
+### 5. Export Flow
+
+```
+┌──────┐         ┌──────────┐         ┌─────────┐         ┌──────────┐
+│Admin │─Export──▶│Frontend  │─GET─────▶│Backend  │─Query──▶│Database  │
+│      │ Excel/PDF│          │ exam_id │         │ All     │          │
+│      │         │          │         │         │ allocation│         │
+│      │         │          │         │         │◀────────│          │
+│      │         │          │         │         │         │          │
+│      │         │          │         │ ┌───────▼─────────┐          │
+│      │         │          │         │ │ EXCEL GENERATOR │          │
+│      │         │          │         │ │  (ExcelJS)      │          │
+│      │         │          │         │ │ • Create workbook│          │
+│      │         │          │         │ │ • Add headers   │          │
+│      │         │          │         │ │ • Add data rows │          │
+│      │         │          │         │ │ • Apply styling │          │
+│      │         │          │         │ └─────────┬───────┘          │
+│      │         │          │         │    OR     │                  │
+│      │         │          │         │ ┌─────────▼───────┐          │
+│      │         │          │         │ │ PDF GENERATOR   │          │
+│      │         │          │         │ │  (PDFKit)       │          │
+│      │         │          │         │ │ • Create doc    │          │
+│      │         │          │         │ │ • Add title     │          │
+│      │         │          │         │ │ • Group by hall │          │
+│      │         │          │         │ │ • Add tables    │          │
+│      │         │          │         │ └─────────┬───────┘          │
+│      │         │          │         │           │                  │
+│      │◀────────│◀─────────│◀────────│◀──────────┘                 │
+│      │Download │Download  │File     │Stream                       │
+│      │ File    │          │Stream   │                             │
+└──────┘         └──────────┘         └─────────┘         └──────────┘
+```
+
+## Database Entity Relationship Diagram
+
+```
+┌──────────────┐
+│   admins     │
+├──────────────┤
+│ id (PK)      │
+│ username     │
+│ password     │
+│ created_at   │
+└──────────────┘
+
+┌──────────────┐
+│ departments  │
+├──────────────┤
+│ id (PK)      │
+│ name         │
+│ code         │
+│ created_at   │
+└──────┬───────┘
+       │
+       │ 1:N
+       │
+       ▼
+┌──────────────┐         ┌──────────────┐
+│  students    │    N:1  │   subjects   │
+├──────────────┤◀────────┤──────────────┤
+│ id (PK)      │         │ id (PK)      │
+│ roll_no      │         │ subject_code │
+│ student_name │         │ subject_name │
+│ department_id│         │ credits      │
+│ subject_code │─────────▶│ exam_id (FK) │
+│ created_at   │         │ created_at   │
+└──────┬───────┘         └──────┬───────┘
+       │                        │
+       │ 1:N                    │ N:1
+       │                        │
+       ▼                        ▼
+┌──────────────┐         ┌──────────────┐
+│seat_allocati│    N:1  │    exams     │
+│ons          │────────▶│──────────────│
+├──────────────┤         │ id (PK)      │
+│ id (PK)      │         │ name         │
+│ student_id   │─┐       │ exam_date    │
+│ hall_id      │ │       │ created_at   │
+│ seat_number  │ │       └──────────────┘
+│ exam_id (FK) │─┘
+│ allocated_at │
+└──────┬───────┘
+       │
+       │ N:1
+       │
+       ▼
+┌──────────────┐
+│    halls     │
+├──────────────┤
+│ id (PK)      │
+│ hall_number  │
+│ seat_capacity│
+│ hall_order   │
+│ created_at   │
+└──────────────┘
+
+Legend:
+PK  = Primary Key
+FK  = Foreign Key
+1:N = One-to-Many
+N:1 = Many-to-One
+```
+
+## Component Hierarchy (Frontend)
+
+```
+App (Router + Auth)
+│
+├── Login Page
+│   └── Login Form
+│
+├── Navbar (on all authenticated pages)
+│   ├── Navigation Links
+│   └── Logout Button
+│
+├── Dashboard
+│   ├── Statistics Cards
+│   │   ├── Total Exams
+│   │   ├── Total Students
+│   │   └── Total Halls
+│   └── Quick Action Buttons
+│
+├── Exams Page
+│   ├── Add Exam Form
+│   └── Exams Table
+│       └── Edit/Delete Actions
+│
+├── Subjects Page
+│   ├── Add Subject Form
+│   └── Subjects Table
+│       └── Edit/Delete Actions
+│
+├── Halls Page
+│   ├── Add Hall Form
+│   └── Halls Table
+│       └── Edit/Delete Actions
+│
+├── Departments Page
+│   ├── Add Department Form
+│   └── Departments Table
+│       └── Edit/Delete Actions
+│
+├── Students Page
+│   ├── File Upload Form
+│   └── Students Table
+│       └── Delete Action
+│
+├── Allocation Page
+│   ├── Exam Selector
+│   ├── Status Display
+│   │   ├── Total Students
+│   │   ├── Allocated
+│   │   └── Unallocated
+│   ├── Generate Button
+│   ├── Clear Button
+│   └── Algorithm Rules Display
+│
+└── Seating Page
+    ├── Exam Selector
+    ├── Export Buttons
+    │   ├── Export to Excel
+    │   └── Export to PDF
+    ├── Student Lookup
+    │   ├── Search Input
+    │   └── Result Display
+    └── Hall View
+        ├── Hall Selector
+        └── Seating Table
+```
+
+## Technology Stack Layers
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    PRESENTATION LAYER                    │
+│                                                          │
+│  React 18 + TypeScript                                  │
+│  • JSX Components                                       │
+│  • React Hooks (useState, useEffect)                   │
+│  • React Router DOM (Navigation)                       │
+│  • CSS (Styling)                                       │
+│                                                          │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+                      │ HTTP (Axios)
+                      │
+┌─────────────────────▼───────────────────────────────────┐
+│                    APPLICATION LAYER                     │
+│                                                          │
+│  Express.js + TypeScript                                │
+│  • Route Handlers                                       │
+│  • Middleware (Auth, CORS, Multer)                     │
+│  • Business Logic                                       │
+│  • Allocation Algorithm                                 │
+│  • File Processing                                      │
+│  • Export Generation                                    │
+│                                                          │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+                      │ SQL (pg)
+                      │
+┌─────────────────────▼───────────────────────────────────┐
+│                      DATA LAYER                          │
+│                                                          │
+│  PostgreSQL                                             │
+│  • 7 Tables with Relationships                          │
+│  • ACID Transactions                                    │
+│  • Foreign Key Constraints                              │
+│  • Unique Constraints                                   │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+```
+
+## Security Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    Security Layers                        │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  1. Frontend Security                                    │
+│     • Protected Routes (JWT check)                       │
+│     • Token Storage (localStorage)                       │
+│     • Auto-redirect on auth failure                      │
+│                                                          │
+│  2. Transport Security                                   │
+│     • HTTPS (production)                                 │
+│     • CORS Configuration                                 │
+│                                                          │
+│  3. Backend Security                                     │
+│     • JWT Verification Middleware                        │
+│     • Password Hashing (bcrypt)                         │
+│     • Input Validation                                   │
+│     • SQL Injection Prevention (parameterized queries)   │
+│                                                          │
+│  4. Database Security                                    │
+│     • User Authentication                                │
+│     • Connection String Protection (.env)                │
+│     • Foreign Key Constraints                            │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+```
+
+## Deployment Architecture (Production)
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                         Internet                         │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     │ HTTPS
+                     │
+┌────────────────────▼────────────────────────────────────┐
+│              CDN / Static Hosting                        │
+│              (Vercel, Netlify, S3)                      │
+│                                                          │
+│              Frontend Build (dist/)                      │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     │ HTTPS API Calls
+                     │
+┌────────────────────▼────────────────────────────────────┐
+│              Application Server                          │
+│              (Heroku, Railway, DigitalOcean)            │
+│                                                          │
+│              Backend API (Node.js)                       │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     │ Secure Connection
+                     │
+┌────────────────────▼────────────────────────────────────┐
+│           Managed Database Service                       │
+│           (AWS RDS, ElephantSQL, Heroku Postgres)       │
+│                                                          │
+│           PostgreSQL Database                            │
+└──────────────────────────────────────────────────────────┘
+```
+
+## File Processing Pipeline
+
+```
+CSV/Excel File Upload
+         │
+         ▼
+┌─────────────────┐
+│ Multer          │
+│ Save to disk    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ XLSX Parser     │
+│ Read file       │
+│ Convert to JSON │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Data Validation │
+│ Check columns   │
+│ Validate format │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Process Rows    │
+│ For each row:   │
+│ • Map dept      │
+│ • Validate subj │
+│ • Upsert student│
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Return Result   │
+│ Success count   │
+│ Error count     │
+│ Error messages  │
+└─────────────────┘
+```
+
+---
+
+This visual overview helps understand the complete system architecture, data flow, and component relationships.
+
+
+
+================================================
+FILE: db.txt
+================================================
+================================================================================
+EXAM HALL SEAT ALLOCATION SYSTEM - DATABASE SETUP GUIDE
+================================================================================
+
+PROJECT ANALYSIS SUMMARY
+================================================================================
+
+1. DATABASE STRUCTURE
+   - Database Name: exam_seat_db
+   - Total Tables: 7
+   - PostgreSQL Version: 14+
+   - Character Set: UTF-8
+
+2. TABLES OVERVIEW
+   ✓ admins             - Admin user authentication
+   ✓ departments        - Academic departments
+   ✓ exams              - Exam information
+   ✓ subjects           - Subject details with exam linking
+   ✓ halls              - Exam hall details with capacity
+   ✓ students           - Student records
+   ✓ seat_allocations   - Seat assignment mapping
+
+3. KEY RELATIONSHIPS
+   - subjects -> exams (many-to-one)
+   - students -> departments (many-to-one)
+   - students -> subjects (many-to-one via subject_code)
+   - seat_allocations -> students (many-to-one)
+   - seat_allocations -> halls (many-to-one)
+   - seat_allocations -> exams (many-to-one)
+
+4. UNIQUE CONSTRAINTS
+   - Admin username must be unique
+   - Department name and code must be unique
+   - Subject code must be unique
+   - Hall number must be unique
+   - Student roll_no must be unique
+   - One seat per student per exam
+   - One student per seat per exam
+
+================================================================================
+DATABASE SETUP INSTRUCTIONS
+================================================================================
+
+METHOD 1: Using psql Command Line
+----------------------------------
+
+Step 1: Open PowerShell as Administrator
+
+Step 2: Connect to PostgreSQL
+   psql -U postgres
+
+Step 3: Create Database
+   CREATE DATABASE exam_seat_db;
+
+Step 4: Connect to Database
+   \c exam_seat_db
+
+Step 5: Run the SQL Script
+   \i 'e:/User_Profile Jagan/Documents/seat-all/backend/setup-database.sql'
+
+Step 6: Verify Tables
+   \dt
+
+
+METHOD 2: Using pgAdmin 4 (GUI)
+--------------------------------
+
+Step 1: Open pgAdmin 4
+
+Step 2: Connect to PostgreSQL Server
+   - Enter your postgres password
+
+Step 3: Create Database
+   - Right-click "Databases" → "Create" → "Database"
+   - Name: exam_seat_db
+   - Click "Save"
+
+Step 4: Open Query Tool
+   - Right-click "exam_seat_db" → "Query Tool"
+
+Step 5: Load and Execute SQL Script
+   - Click "Open File" icon
+   - Select: e:\User_Profile Jagan\Documents\seat-all\backend\setup-database.sql
+   - Click "Execute" (F5)
+
+Step 6: Verify Tables
+   - Refresh "exam_seat_db" → "Schemas" → "public" → "Tables"
+
+
+METHOD 3: Using Node.js Migration Script
+-----------------------------------------
+
+Step 1: Navigate to Backend Directory
+   cd "e:\User_Profile Jagan\Documents\seat-all\backend"
+
+Step 2: Ensure .env File Exists
+   - Copy .env.example to .env
+   - Edit DATABASE_URL with your credentials:
+     DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/exam_seat_db
+
+Step 3: Build TypeScript Code
+   npm run build
+
+Step 4: Run Migration
+   npm run db:migrate
+
+Step 5: Verify
+   - Check console output: "All tables created successfully"
+
+
+METHOD 4: One-Line PowerShell Command
+--------------------------------------
+
+psql -U postgres -c "CREATE DATABASE exam_seat_db;" ; psql -U postgres -d exam_seat_db -f "e:\User_Profile Jagan\Documents\seat-all\backend\setup-database.sql"
+
+================================================================================
+COMPLETE SQL SCRIPT (for manual execution)
+================================================================================
+
+-- Step 1: Create Database (if not exists)
+CREATE DATABASE exam_seat_db;
+
+-- Step 2: Connect to Database
+\c exam_seat_db
+
+-- Step 3: Create Tables
+
+-- Admins Table
+CREATE TABLE admins (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Departments Table
+CREATE TABLE departments (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    code VARCHAR(50) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Exams Table
+CREATE TABLE exams (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    exam_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Subjects Table
+CREATE TABLE subjects (
+    id SERIAL PRIMARY KEY,
+    subject_code VARCHAR(50) UNIQUE NOT NULL,
+    subject_name VARCHAR(255) NOT NULL,
+    credits INTEGER,
+    exam_id INTEGER REFERENCES exams(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Halls Table
+CREATE TABLE halls (
+    id SERIAL PRIMARY KEY,
+    hall_number VARCHAR(100) UNIQUE NOT NULL,
+    seat_capacity INTEGER NOT NULL,
+    hall_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Students Table
+CREATE TABLE students (
+    id SERIAL PRIMARY KEY,
+    roll_no VARCHAR(100) UNIQUE NOT NULL,
+    student_name VARCHAR(255) NOT NULL,
+    department_id INTEGER REFERENCES departments(id) ON DELETE SET NULL,
+    subject_code VARCHAR(50) REFERENCES subjects(subject_code) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Seat Allocations Table
+CREATE TABLE seat_allocations (
+    id SERIAL PRIMARY KEY,
+    student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
+    hall_id INTEGER REFERENCES halls(id) ON DELETE CASCADE,
+    seat_number INTEGER NOT NULL,
+    exam_id INTEGER REFERENCES exams(id) ON DELETE CASCADE,
+    allocated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(hall_id, seat_number, exam_id),
+    UNIQUE(student_id, exam_id)
+);
+
+-- Step 4: Create Indexes for Performance
+CREATE INDEX idx_students_roll_no ON students(roll_no);
+CREATE INDEX idx_students_department ON students(department_id);
+CREATE INDEX idx_students_subject ON students(subject_code);
+CREATE INDEX idx_subjects_exam ON subjects(exam_id);
+CREATE INDEX idx_seat_allocations_student ON seat_allocations(student_id);
+CREATE INDEX idx_seat_allocations_hall ON seat_allocations(hall_id);
+CREATE INDEX idx_seat_allocations_exam ON seat_allocations(exam_id);
+
+================================================================================
+VERIFICATION QUERIES
+================================================================================
+
+-- Check if all tables exist
+SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+ORDER BY table_name;
+
+-- Check table structures
+\d admins
+\d departments
+\d exams
+\d subjects
+\d halls
+\d students
+\d seat_allocations
+
+-- Count records in each table
+SELECT 'admins' as table_name, COUNT(*) as count FROM admins
+UNION ALL
+SELECT 'departments', COUNT(*) FROM departments
+UNION ALL
+SELECT 'exams', COUNT(*) FROM exams
+UNION ALL
+SELECT 'subjects', COUNT(*) FROM subjects
+UNION ALL
+SELECT 'halls', COUNT(*) FROM halls
+UNION ALL
+SELECT 'students', COUNT(*) FROM students
+UNION ALL
+SELECT 'seat_allocations', COUNT(*) FROM seat_allocations;
+
+================================================================================
+SAMPLE DATA INSERTION (Optional)
+================================================================================
+
+-- Insert Sample Admin (password: admin123, hashed with bcrypt)
+INSERT INTO admins (username, password) 
+VALUES ('admin', '$2a$10$YourHashedPasswordHere');
+
+-- Insert Sample Departments
+INSERT INTO departments (name, code) VALUES 
+('Computer Science', 'CS'),
+('Mechanical Engineering', 'ME'),
+('Electrical Engineering', 'EE'),
+('Civil Engineering', 'CE');
+
+-- Insert Sample Exam
+INSERT INTO exams (name, exam_date) 
+VALUES ('Mid Semester Exam 2024', '2024-12-15');
+
+-- Insert Sample Subjects
+INSERT INTO subjects (subject_code, subject_name, credits, exam_id) VALUES 
+('CS101', 'Introduction to Programming', 4, 1),
+('CS102', 'Data Structures', 4, 1),
+('ME101', 'Engineering Mechanics', 4, 1),
+('EE101', 'Circuit Theory', 4, 1);
+
+-- Insert Sample Halls
+INSERT INTO halls (hall_number, seat_capacity, hall_order) VALUES 
+('Hall A', 30, 1),
+('Hall B', 25, 2),
+('Hall C', 20, 3);
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+ERROR: "database exam_seat_db does not exist"
+SOLUTION: Run: CREATE DATABASE exam_seat_db;
+
+ERROR: "permission denied"
+SOLUTION: Run psql as postgres superuser: psql -U postgres
+
+ERROR: "role postgres does not exist"
+SOLUTION: Use your PostgreSQL username instead of postgres
+
+ERROR: "could not connect to server"
+SOLUTION: Ensure PostgreSQL service is running:
+   Get-Service -Name "postgresql*"
+   Start-Service -Name "postgresql-x64-14"
+
+ERROR: "relation already exists"
+SOLUTION: Drop existing tables first (see setup-database.sql)
+
+ERROR: Tables created but application can't connect
+SOLUTION: Check .env file DATABASE_URL matches your credentials
+
+================================================================================
+DATABASE CONNECTION STRINGS
+================================================================================
+
+Node.js (pg library):
+postgresql://postgres:password@localhost:5432/exam_seat_db
+
+Connection String Format:
+postgresql://[username]:[password]@[host]:[port]/[database]
+
+Example .env file:
+PORT=5000
+DATABASE_URL=postgresql://postgres:yourpassword@localhost:5432/exam_seat_db
+JWT_SECRET=your_secret_key_here
+NODE_ENV=development
+
+================================================================================
+NEXT STEPS AFTER DATABASE SETUP
+================================================================================
+
+1. ✓ Database created
+2. ✓ Tables created
+3. → Create admin user via API:
+      POST http://localhost:5000/api/auth/register
+      Body: {"username":"admin","password":"admin123"}
+
+4. → Login to application:
+      http://localhost:3000
+      Username: admin
+      Password: admin123
+
+5. → Add initial data:
+      - Departments
+      - Exams
+      - Subjects
+      - Halls
+
+6. → Upload students via CSV
+
+7. → Generate seat allocation
+
+8. → View and export seating plans
+
+================================================================================
+BACKUP AND RESTORE
+================================================================================
+
+Backup Database:
+pg_dump -U postgres exam_seat_db > backup.sql
+
+Restore Database:
+psql -U postgres exam_seat_db < backup.sql
+
+Export to CSV:
+\copy (SELECT * FROM students) TO 'students.csv' CSV HEADER
+
+================================================================================
+
+For more information, see:
+- README.md - Complete documentation
+- INSTALLATION_GUIDE.md - Detailed setup guide
+- API_TESTING.md - API endpoint reference
+
+Database setup script location:
+e:\User_Profile Jagan\Documents\seat-all\backend\setup-database.sql
+
+================================================================================
+
+
+
+================================================
+FILE: DOCUMENTATION_INDEX.md
+================================================
+# 📚 Exam Hall Seat Allocation System - Documentation Index
+
+Welcome! This is your complete guide to the Exam Hall Seat Allocation System.
+
+## 🚀 Quick Start
+
+**New to the project? Start here:**
+
+1. **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** ⭐ START HERE
+   - Complete step-by-step setup instructions
+   - Prerequisites installation
+   - Database setup
+   - Running the application
+   - Testing guide
+   - Troubleshooting
+
+## 📖 Documentation Files
+
+### Core Documentation
+
+1. **[README.md](README.md)** - Main Documentation
+
+   - Features overview
+   - Technology stack
+   - Folder structure
+   - Installation & setup
+   - Usage guide
+   - API endpoints reference
+   - Allocation algorithm details
+   - Database schema
+   - Production deployment
+   - Security notes
+
+2. **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** - Detailed Setup
+
+   - Prerequisites installation (Node.js, PostgreSQL)
+   - Database creation steps
+   - Backend setup
+   - Frontend setup
+   - Initial configuration
+   - Step-by-step testing
+   - Troubleshooting common issues
+   - Production deployment checklist
+
+3. **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)** - Quick Overview
+
+   - Complete implementation checklist
+   - All modules implemented
+   - Files created summary
+   - Database schema
+   - API endpoints summary
+   - Frontend pages list
+   - Running instructions
+   - Project status
+
+4. **[FILE_STRUCTURE.md](FILE_STRUCTURE.md)** - Code Organization
+
+   - Complete file tree
+   - File descriptions
+   - Key algorithms explained
+   - Database tables
+   - Technology stack details
+   - Total files count
+
+5. **[API_TESTING.md](API_TESTING.md)** - API Reference
+   - All API endpoints with examples
+   - Request/response samples
+   - Authentication setup
+   - Quick test sequence
+   - Testing notes
+
+### Additional Files
+
+6. **[sample-students.csv](sample-students.csv)** - Sample Data
+
+   - 20 sample student records
+   - 4 different departments
+   - Multiple subjects
+   - Ready to upload for testing
+
+7. **[quick-start.ps1](quick-start.ps1)** - Setup Script
+   - Automated setup script for Windows PowerShell
+   - Checks prerequisites
+   - Installs dependencies
+   - Creates necessary files
+   - Setup instructions
+
+## 🎯 Documentation by Use Case
+
+### I want to...
+
+#### Install and Run the Application
+
+→ **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** - Complete walkthrough
+
+#### Understand What This Project Does
+
+→ **[README.md](README.md)** - Features section
+→ **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)** - Overview
+
+#### Know What Files Are Included
+
+→ **[FILE_STRUCTURE.md](FILE_STRUCTURE.md)** - Complete file tree
+
+#### Test the API Endpoints
+
+→ **[API_TESTING.md](API_TESTING.md)** - API reference with examples
+
+#### Understand the Allocation Algorithm
+
+→ **[README.md](README.md)** - Allocation Algorithm section
+→ **[FILE_STRUCTURE.md](FILE_STRUCTURE.md)** - Key Algorithms
+
+#### Deploy to Production
+
+→ **[README.md](README.md)** - Production Deployment section
+→ **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** - Production Deployment
+
+#### Add Sample Data
+
+→ **[sample-students.csv](sample-students.csv)** - Sample file
+→ **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** - Testing section
+
+#### Troubleshoot Issues
+
+→ **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** - Troubleshooting section
+→ **[README.md](README.md)** - Troubleshooting section
+
+## 📂 Project Structure
+
+```
+seat-all/
+├── backend/              # Express.js + TypeScript backend
+├── frontend/             # React + TypeScript frontend
+├── README.md            # Main documentation
+├── INSTALLATION_GUIDE.md # Detailed setup guide
+├── PROJECT_SUMMARY.md   # Quick overview
+├── FILE_STRUCTURE.md    # Code organization
+├── API_TESTING.md       # API reference
+├── DOCUMENTATION_INDEX.md # This file
+├── sample-students.csv  # Sample data
+└── quick-start.ps1      # Setup script
+```
+
+## 🎓 Learning Path
+
+**Recommended Reading Order:**
+
+### For First-Time Setup:
+
+1. DOCUMENTATION_INDEX.md (this file) - Overview
+2. INSTALLATION_GUIDE.md - Step-by-step setup ⭐
+3. Sample testing with sample-students.csv
+4. README.md - Understand features in detail
+
+### For Developers:
+
+1. PROJECT_SUMMARY.md - What's implemented
+2. FILE_STRUCTURE.md - Code organization
+3. API_TESTING.md - API endpoints
+4. Explore the actual code files
+
+### For Users/Administrators:
+
+1. INSTALLATION_GUIDE.md - Installation
+2. README.md - Usage Guide section
+3. Use the web interface
+
+## 🌟 Key Features
+
+### ✅ Implemented Modules
+
+1. **Admin Module** - JWT authentication, dashboard
+2. **Exam Management** - Add, edit, delete exams
+3. **Subject Management** - Subjects with codes and credits
+4. **Hall Management** - Halls with capacity and order
+5. **Department Management** - Academic departments
+6. **Student Upload** - CSV/Excel upload with auto-mapping
+7. **Automatic Allocation** - Smart seating algorithm
+8. **Seating Display** - Hall-wise view and student lookup
+9. **Export Features** - Excel and PDF export
+
+## 🔧 Technology Stack
+
+- **Backend:** Node.js, Express.js, TypeScript, PostgreSQL
+- **Frontend:** React 18, TypeScript, Vite
+- **Database:** PostgreSQL
+- **Authentication:** JWT
+- **File Processing:** Multer, XLSX, ExcelJS, PDFKit
+
+## 📊 Database Tables
+
+1. admins
+2. departments
+3. exams
+4. subjects
+5. halls
+6. students
+7. seat_allocations
+
+## 🚀 Getting Started in 3 Steps
+
+### 1. Prerequisites
+
+- Install Node.js (v18+)
+- Install PostgreSQL (v14+)
+- Create database: `exam_seat_db`
+
+### 2. Setup
+
+```powershell
+# Backend
+cd backend
+npm install
+npm run build
+npm run db:migrate
+npm run dev
+
+# Frontend (new terminal)
+cd frontend
+npm install
+npm run dev
+
+# Create admin (new terminal)
+curl -X POST http://localhost:5000/api/auth/register `
+  -H "Content-Type: application/json" `
+  -d '{"username":"admin","password":"admin123"}'
+```
+
+### 3. Access
+
+- Open: http://localhost:3000
+- Login: admin / admin123
+
+## 📱 Application URLs
+
+- **Frontend:** http://localhost:3000
+- **Backend:** http://localhost:5000
+- **API:** http://localhost:5000/api
+- **Health Check:** http://localhost:5000/health
+
+## 📞 Support & Help
+
+### Troubleshooting
+
+See **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** - Troubleshooting section
+
+### Common Issues
+
+1. **Backend won't start** → Check PostgreSQL connection
+2. **Frontend connection error** → Ensure backend is running
+3. **Upload fails** → Check file format and required columns
+4. **Allocation error** → Verify halls and students exist
+
+## 🎉 Project Status
+
+✅ **COMPLETE** - All features implemented and tested
+
+- 45+ files created
+- 9 frontend pages
+- 15+ API endpoints
+- Full documentation
+- Sample data included
+- Ready to deploy
+
+## 📄 Document Summaries
+
+| Document                   | Purpose                    | Pages |
+| -------------------------- | -------------------------- | ----- |
+| **INSTALLATION_GUIDE.md**  | Complete setup walkthrough | ~15   |
+| **README.md**              | Main documentation         | ~25   |
+| **PROJECT_SUMMARY.md**     | Quick overview             | ~8    |
+| **FILE_STRUCTURE.md**      | Code organization          | ~10   |
+| **API_TESTING.md**         | API reference              | ~6    |
+| **DOCUMENTATION_INDEX.md** | This file                  | ~5    |
+
+Total: ~70 pages of documentation!
+
+## 🔗 Quick Links
+
+- [Installation Guide](INSTALLATION_GUIDE.md)
+- [API Testing](API_TESTING.md)
+- [Project Summary](PROJECT_SUMMARY.md)
+- [File Structure](FILE_STRUCTURE.md)
+- [Main Documentation](README.md)
+- [Sample Data](sample-students.csv)
+
+## 💡 Tips
+
+1. **Always start with INSTALLATION_GUIDE.md** for first-time setup
+2. **Use sample-students.csv** to test the upload feature
+3. **Create halls before generating allocation**
+4. **Hall order determines allocation sequence**
+5. **Export to Excel/PDF after allocation**
+
+## 🎯 Next Steps After Installation
+
+1. ✅ Complete installation following INSTALLATION_GUIDE.md
+2. ✅ Login to web interface
+3. ✅ Add departments, exams, subjects, halls
+4. ✅ Upload sample-students.csv
+5. ✅ Generate seat allocation
+6. ✅ View seating arrangements
+7. ✅ Export to Excel/PDF
+8. ✅ Explore all features
+
+---
+
+**Ready to get started? → Open [INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** 🚀
+
+**Need help? → Check [README.md](README.md) Troubleshooting section** 🛠️
+
+**Want API details? → See [API_TESTING.md](API_TESTING.md)** 📡
+
+---
+
+_Built with ❤️ using React, TypeScript, Express.js, and PostgreSQL_
+
+
+
+================================================
+FILE: FILE_STRUCTURE.md
+================================================
+[Binary file]
+
+
+================================================
+FILE: INSTALLATION_GUIDE.md
+================================================
+# 🚀 Installation & Setup Guide
+
+## Complete Step-by-Step Instructions for Windows
+
+### Prerequisites Installation
+
+#### 1. Install Node.js
+
+1. Download Node.js from https://nodejs.org/ (v18 or higher)
+2. Run the installer
+3. Verify installation:
+
+```powershell
+node --version
+npm --version
+```
+
+#### 2. Install PostgreSQL
+
+1. Download PostgreSQL from https://www.postgresql.org/download/windows/
+2. Run the installer
+3. During installation:
+   - Remember the password you set for postgres user
+   - Default port: 5432
+   - Install pgAdmin 4 (GUI tool)
+4. Verify installation:
+
+```powershell
+psql --version
+```
+
+### Database Setup
+
+#### 1. Create Database
+
+**Option A: Using pgAdmin 4 (GUI)**
+
+1. Open pgAdmin 4
+2. Connect to PostgreSQL server (enter your password)
+3. Right-click on "Databases" → "Create" → "Database"
+4. Name: `exam_seat_db`
+5. Click "Save"
+
+**Option B: Using Command Line**
+
+```powershell
+# Open PowerShell and connect to PostgreSQL
+psql -U postgres
+
+# Enter your postgres password when prompted
+# Then run:
+CREATE DATABASE exam_seat_db;
+
+# Exit psql
+\q
+```
+
+### Project Setup
+
+#### 1. Navigate to Project Directory
+
+```powershell
+cd "e:\User_Profile Jagan\Documents\seat-all"
+```
+
+#### 2. Backend Setup
+
+```powershell
+# Navigate to backend folder
+cd backend
+
+# Install dependencies (this will take a few minutes)
+npm install
+
+# Create .env file from template
+Copy-Item .env.example .env
+
+# Open .env file and edit with your credentials
+notepad .env
+```
+
+**Edit .env file:**
+
+```env
+PORT=5000
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/exam_seat_db
+JWT_SECRET=my_super_secret_jwt_key_change_this_in_production
+NODE_ENV=development
+```
+
+Replace `YOUR_PASSWORD` with your PostgreSQL password.
+
+```powershell
+# Build TypeScript code
+npm run build
+
+# Run database migrations to create tables
+npm run db:migrate
+
+# You should see: "All tables created successfully"
+
+# Create uploads directory for file storage
+mkdir uploads
+
+# Start the backend server
+npm run dev
+```
+
+**Expected output:**
+
+```
+Server is running on port 5000
+```
+
+Keep this terminal window open. Backend is now running on http://localhost:5000
+
+#### 3. Frontend Setup
+
+Open a **NEW** PowerShell terminal:
+
+```powershell
+# Navigate to frontend folder
+cd "e:\User_Profile Jagan\Documents\seat-all\frontend"
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+**Expected output:**
+
+```
+  VITE v5.0.7  ready in 500 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+```
+
+Keep this terminal window open. Frontend is now running on http://localhost:3000
+
+### Initial Configuration
+
+#### 1. Create Admin User
+
+Open a **THIRD** PowerShell terminal:
+
+```powershell
+# Create admin user using API
+curl -X POST http://localhost:5000/api/auth/register `
+  -H "Content-Type: application/json" `
+  -d '{"username":"admin","password":"admin123"}'
+```
+
+**Expected response:**
+
+```json
+{
+  "message": "Admin created successfully",
+  "admin": {
+    "id": 1,
+    "username": "admin"
+  }
+}
+```
+
+**Alternative:** Use a tool like Postman or Thunder Client if curl doesn't work.
+
+#### 2. Access the Application
+
+1. Open your web browser
+2. Go to: http://localhost:3000
+3. You should see the login page
+4. Login with:
+   - **Username:** admin
+   - **Password:** admin123
+
+### Testing the Application
+
+#### Step 1: Add Departments
+
+1. Click "Departments" in the navbar
+2. Click "Add New Department"
+3. Add these departments:
+
+| Name                   | Code |
+| ---------------------- | ---- |
+| Computer Science       | CS   |
+| Mechanical Engineering | ME   |
+| Electrical Engineering | EE   |
+| Civil Engineering      | CE   |
+
+#### Step 2: Create an Exam
+
+1. Click "Exams" in the navbar
+2. Click "Add New Exam"
+3. Enter:
+   - Name: "Mid Semester Exam 2024"
+   - Date: Select any future date
+4. Click "Create"
+
+#### Step 3: Add Subjects
+
+1. Click "Subjects" in the navbar
+2. Add these subjects:
+
+| Subject Code | Subject Name                | Credits | Exam                   |
+| ------------ | --------------------------- | ------- | ---------------------- |
+| CS101        | Introduction to Programming | 4       | Mid Semester Exam 2024 |
+| CS102        | Data Structures             | 4       | Mid Semester Exam 2024 |
+| ME101        | Engineering Mechanics       | 4       | Mid Semester Exam 2024 |
+| ME102        | Thermodynamics              | 4       | Mid Semester Exam 2024 |
+| EE101        | Circuit Theory              | 4       | Mid Semester Exam 2024 |
+| EE102        | Digital Electronics         | 4       | Mid Semester Exam 2024 |
+| CE101        | Structural Analysis         | 4       | Mid Semester Exam 2024 |
+| CE102        | Fluid Mechanics             | 4       | Mid Semester Exam 2024 |
+
+#### Step 4: Add Halls
+
+1. Click "Halls" in the navbar
+2. Add these halls:
+
+| Hall Number | Seat Capacity | Hall Order |
+| ----------- | ------------- | ---------- |
+| Hall A      | 30            | 1          |
+| Hall B      | 25            | 2          |
+| Hall C      | 20            | 3          |
+
+**Note:** Hall Order determines allocation sequence. Lower numbers fill first.
+
+#### Step 5: Upload Students
+
+1. Click "Students" in the navbar
+2. Use the sample CSV file provided: `sample-students.csv`
+3. Click "Choose File" and select `sample-students.csv`
+4. Click "Upload Students"
+5. You should see: "Upload completed: 20 students uploaded"
+
+#### Step 6: Generate Seat Allocation
+
+1. Click "Allocation" in the navbar
+2. Select "Mid Semester Exam 2024" from dropdown
+3. You'll see statistics:
+   - Total Students: 20
+   - Allocated Students: 0
+   - Unallocated Students: 20
+4. Click "Generate Allocation"
+5. Wait for confirmation: "Allocation completed: 20 students allocated"
+6. Statistics will update to show all students allocated
+
+#### Step 7: View Seating Arrangements
+
+1. Click "Seating" in the navbar
+2. Select "Mid Semester Exam 2024" from dropdown
+3. **Hall-wise View:**
+   - Select "Hall A" from the second dropdown
+   - See all students in Hall A with seat numbers
+4. **Student Lookup:**
+   - Enter a roll number (e.g., "CS001")
+   - Click "Search"
+   - See the student's hall and seat assignment
+
+#### Step 8: Export Seating Plan
+
+1. On the Seating page with exam selected
+2. Click "Export to Excel" - Downloads .xlsx file
+3. Click "Export to PDF" - Downloads .pdf file
+4. Open the downloaded files to see formatted seating plans
+
+### Troubleshooting
+
+#### Backend won't start
+
+**Error: "Cannot connect to database"**
+
+```powershell
+# Check if PostgreSQL is running
+Get-Service -Name "postgresql*"
+
+# If not running, start it
+Start-Service -Name "postgresql-x64-14"  # Adjust version number
+```
+
+**Error: "Port 5000 already in use"**
+
+```powershell
+# Find process using port 5000
+netstat -ano | findstr :5000
+
+# Kill the process (replace PID with actual process ID)
+taskkill /PID <PID> /F
+
+# Or change port in backend/.env
+PORT=5001
+```
+
+#### Frontend won't start
+
+**Error: "Port 3000 already in use"**
+
+```powershell
+# Edit vite.config.ts and change port:
+server: {
+  port: 3001,  # Change to 3001
+  ...
+}
+```
+
+#### Cannot create admin user
+
+**Error: "ECONNREFUSED"**
+
+- Make sure backend is running on port 5000
+- Check if you can access http://localhost:5000/health in browser
+
+**Error: "Username already exists"**
+
+- Admin user already created, proceed to login
+
+#### Upload fails
+
+**Error: "No halls available"**
+
+- Create at least one hall before allocating
+
+**Error: "Subject not found"**
+
+- Make sure all subject codes in CSV exist in the database
+- Create subjects before uploading students
+
+#### Login fails
+
+**Error: "Invalid credentials"**
+
+- Make sure you created admin user first
+- Username and password are case-sensitive
+- Default: admin / admin123
+
+### Stopping the Application
+
+#### Stop Backend
+
+1. Go to the terminal running backend
+2. Press `Ctrl + C`
+3. Type `Y` and press Enter
+
+#### Stop Frontend
+
+1. Go to the terminal running frontend
+2. Press `Ctrl + C`
+3. Type `Y` and press Enter
+
+### Restarting the Application
+
+#### Start Backend
+
+```powershell
+cd "e:\User_Profile Jagan\Documents\seat-all\backend"
+npm run dev
+```
+
+#### Start Frontend
+
+```powershell
+cd "e:\User_Profile Jagan\Documents\seat-all\frontend"
+npm run dev
+```
+
+### Database Management
+
+#### View Database in pgAdmin 4
+
+1. Open pgAdmin 4
+2. Navigate to: Servers → PostgreSQL → Databases → exam_seat_db
+3. Right-click → "Query Tool" to run SQL queries
+4. Or expand tables to view data
+
+#### Reset Database (Clear all data)
+
+```powershell
+# Connect to PostgreSQL
+psql -U postgres
+
+# Drop and recreate database
+DROP DATABASE exam_seat_db;
+CREATE DATABASE exam_seat_db;
+\q
+
+# Run migrations again
+cd backend
+npm run db:migrate
+
+# Recreate admin user
+curl -X POST http://localhost:5000/api/auth/register `
+  -H "Content-Type: application/json" `
+  -d '{"username":"admin","password":"admin123"}'
+```
+
+### Production Deployment
+
+For production deployment, follow these additional steps:
+
+1. **Build Frontend:**
+
+```powershell
+cd frontend
+npm run build
+# Output will be in frontend/dist/
+```
+
+2. **Build Backend:**
+
+```powershell
+cd backend
+npm run build
+# Output will be in backend/dist/
+```
+
+3. **Set Production Environment Variables:**
+
+```env
+NODE_ENV=production
+DATABASE_URL=your_production_database_url
+JWT_SECRET=very_strong_random_secret_key
+```
+
+4. **Deploy:**
+   - Deploy frontend/dist to static hosting (Vercel, Netlify, etc.)
+   - Deploy backend to Node.js hosting (Heroku, Railway, DigitalOcean, etc.)
+   - Use managed PostgreSQL service (AWS RDS, ElephantSQL, etc.)
+
+### Security Checklist for Production
+
+- [ ] Change JWT_SECRET to a strong random string
+- [ ] Use HTTPS for both frontend and backend
+- [ ] Configure CORS to allow only your frontend domain
+- [ ] Remove or protect the `/api/auth/register` endpoint
+- [ ] Use environment variables for all secrets
+- [ ] Set up database backups
+- [ ] Add rate limiting to API endpoints
+- [ ] Use a strong PostgreSQL password
+
+### Support & Help
+
+If you encounter issues:
+
+1. Check if all services are running (PostgreSQL, Backend, Frontend)
+2. Verify environment variables in .env
+3. Check terminal output for error messages
+4. Ensure PostgreSQL database exists
+5. Verify all dependencies are installed
+6. Check if ports are available (5000, 3000, 5432)
+
+### Next Steps
+
+After successful installation:
+
+1. Explore all features in the web interface
+2. Try different allocation scenarios
+3. Export seating plans in different formats
+4. Customize the application for your needs
+5. Add more students, halls, and exams
+6. Test with larger datasets
+
+---
+
+**Congratulations! Your Exam Hall Seat Allocation System is now running! 🎉**
+
+For more information, see:
+
+- README.md - Complete documentation
+- API_TESTING.md - API endpoint guide
+- FILE_STRUCTURE.md - File organization
+- PROJECT_SUMMARY.md - Feature overview
+
+
+
+================================================
+FILE: PROJECT_SUMMARY.md
+================================================
+# PROJECT SUMMARY - Exam Hall Seat Allocation System
+
+## ✅ Complete Implementation
+
+### Backend (Express.js + TypeScript + PostgreSQL)
+
+**Files Created:**
+
+- `backend/package.json` - Dependencies and scripts
+- `backend/tsconfig.json` - TypeScript configuration
+- `backend/.env.example` - Environment variables template
+- `backend/src/config/database.ts` - Database connection
+- `backend/src/database/schema.ts` - Database tables schema
+- `backend/src/database/migrate.ts` - Migration runner
+- `backend/src/middleware/auth.ts` - JWT authentication middleware
+- `backend/src/routes/auth.ts` - Admin login/register
+- `backend/src/routes/exams.ts` - Exam CRUD operations
+- `backend/src/routes/subjects.ts` - Subject management
+- `backend/src/routes/halls.ts` - Hall management
+- `backend/src/routes/departments.ts` - Department management
+- `backend/src/routes/students.ts` - Student upload & management
+- `backend/src/routes/allocation.ts` - **Automatic seating algorithm**
+- `backend/src/routes/seating.ts` - Seating display & lookup
+- `backend/src/routes/export.ts` - Excel & PDF export
+- `backend/src/server.ts` - Express server setup
+
+**Key Features Implemented:**
+✅ JWT-based authentication
+✅ PostgreSQL database with migrations
+✅ Complete CRUD for all entities
+✅ CSV/Excel student upload with upsert
+✅ Automatic department creation
+✅ **Automatic seating allocation algorithm** (hall-by-hall, seat-by-seat)
+✅ Excel export using ExcelJS
+✅ PDF export using PDFKit
+✅ File upload support with Multer
+
+### Frontend (React + TypeScript + Vite)
+
+**Files Created:**
+
+- `frontend/package.json` - Dependencies
+- `frontend/vite.config.ts` - Vite configuration with proxy
+- `frontend/tsconfig.json` - TypeScript configuration
+- `frontend/index.html` - HTML entry point
+- `frontend/src/main.tsx` - React entry point
+- `frontend/src/App.tsx` - Main app with routing
+- `frontend/src/App.css` - Complete styling
+- `frontend/src/services/api.ts` - API service layer
+- `frontend/src/pages/Login.tsx` - Login page
+- `frontend/src/pages/Dashboard.tsx` - Admin dashboard
+- `frontend/src/pages/Exams.tsx` - Exam management
+- `frontend/src/pages/Subjects.tsx` - Subject management
+- `frontend/src/pages/Halls.tsx` - Hall management
+- `frontend/src/pages/Departments.tsx` - Department management
+- `frontend/src/pages/Students.tsx` - Student upload & list
+- `frontend/src/pages/Allocation.tsx` - **Allocation generation UI**
+- `frontend/src/pages/Seating.tsx` - **Seating view & export**
+
+**Key Features Implemented:**
+✅ Protected routes with authentication
+✅ React Router for navigation
+✅ Complete UI for all modules
+✅ File upload interface
+✅ Allocation generation with status
+✅ Hall-wise seating view
+✅ Student seat lookup
+✅ Excel & PDF download
+✅ Toast notifications
+✅ Responsive design
+
+### Documentation
+
+**Files Created:**
+
+- `README.md` - **Complete documentation with setup guide**
+- `API_TESTING.md` - API endpoint testing guide
+- `sample-students.csv` - Sample data for testing
+- `quick-start.ps1` - PowerShell setup script
+
+## 🎯 All Requested Modules Implemented
+
+### 1. ✅ Admin Module
+
+- JWT-based login
+- Admin dashboard with statistics
+- Protected routes
+
+### 2. ✅ Exam Management
+
+- Add/Edit/Delete exams
+- Exam name and date
+- List all exams
+
+### 3. ✅ Subject Management
+
+- Add subjects with code, name, credits
+- Link to exams
+- Edit/Delete subjects
+
+### 4. ✅ Hall Management
+
+- Add halls with number and capacity
+- Hall order for allocation sequence
+- Edit/Delete halls
+
+### 5. ✅ Department Management
+
+- Add/List departments
+- Department code and name
+
+### 6. ✅ Student Dataset Upload
+
+- Upload CSV/Excel files
+- Required columns: roll_no, student_name, department, subject_code
+- Auto-create departments
+- Validate subjects
+- Upsert duplicates
+
+### 7. ✅ Automatic Seating System
+
+**Algorithm Implementation:**
+
+- ✅ Fill halls hall-by-hall
+- ✅ Seat-by-seat sequential filling
+- ✅ Seat numbering from 1 to capacity
+- ✅ Unique seat per student
+- ✅ Sequential hall allocation by order
+- ✅ Endpoint: `/api/allocation/generate`
+
+### 8. ✅ Seating Display
+
+- ✅ Hall-wise view (all students in a hall)
+- ✅ Student seat lookup by roll number
+- ✅ Show hall number, seat number, subject
+
+### 9. ✅ Export Features
+
+- ✅ Export to Excel (.xlsx) using ExcelJS
+- ✅ Export to PDF (.pdf) using PDFKit
+- ✅ Download functionality in frontend
+
+## 📊 Database Schema
+
+**Tables Created:**
+
+1. `admins` - Admin authentication
+2. `departments` - Academic departments
+3. `exams` - Exam details
+4. `subjects` - Subject information
+5. `halls` - Exam hall details
+6. `students` - Student records
+7. `seat_allocations` - Seat assignment mapping
+
+**Relationships:**
+
+- Subjects → Exams (many-to-one)
+- Students → Departments (many-to-one)
+- Students → Subjects (many-to-one via subject_code)
+- Seat Allocations → Students, Halls, Exams (foreign keys)
+
+## 🚀 Running the Application
+
+### Prerequisites
+
+```powershell
+# 1. Install PostgreSQL
+# 2. Create database
+psql -U postgres
+CREATE DATABASE exam_seat_db;
+```
+
+### Backend
+
+```powershell
+cd backend
+npm install
+# Edit .env with database credentials
+npm run build
+npm run db:migrate
+npm run dev
+# Runs on http://localhost:5000
+```
+
+### Frontend
+
+```powershell
+cd frontend
+npm install
+npm run dev
+# Runs on http://localhost:3000
+```
+
+### Create Admin
+
+```powershell
+# Using curl
+curl -X POST http://localhost:5000/api/auth/register `
+  -H "Content-Type: application/json" `
+  -d '{"username":"admin","password":"admin123"}'
+```
+
+### Login
+
+- URL: http://localhost:3000
+- Username: admin
+- Password: admin123
+
+## 📝 API Endpoints Summary
+
+### Authentication
+
+- POST `/api/auth/register` - Create admin
+- POST `/api/auth/login` - Login
+
+### Management (All require authentication)
+
+- `/api/exams` - Exam CRUD
+- `/api/subjects` - Subject CRUD
+- `/api/halls` - Hall CRUD
+- `/api/departments` - Department CRUD
+- `/api/students` - Student management
+  - POST `/api/students/upload` - Upload CSV/Excel
+
+### Allocation
+
+- POST `/api/allocation/generate` - Generate allocation
+- GET `/api/allocation/status/:exam_id` - Get status
+- DELETE `/api/allocation/clear/:exam_id` - Clear allocation
+
+### Seating
+
+- GET `/api/seating/hall/:hall_id/:exam_id` - Hall view
+- GET `/api/seating/student/:roll_no/:exam_id` - Student lookup
+- GET `/api/seating/exam/:exam_id` - All allocations
+
+### Export
+
+- GET `/api/export/excel/:exam_id` - Download Excel
+- GET `/api/export/pdf/:exam_id` - Download PDF
+
+## 🎨 Frontend Pages
+
+1. **Login** (`/login`) - Admin authentication
+2. **Dashboard** (`/dashboard`) - Overview with statistics
+3. **Exams** (`/exams`) - Manage exams
+4. **Subjects** (`/subjects`) - Manage subjects
+5. **Halls** (`/halls`) - Manage halls
+6. **Departments** (`/departments`) - Manage departments
+7. **Students** (`/students`) - Upload & view students
+8. **Allocation** (`/allocation`) - Generate seat allocation
+9. **Seating** (`/seating`) - View seating & export
+
+## 🔐 Security Features
+
+- JWT token-based authentication
+- Protected API routes
+- Bcrypt password hashing
+- Environment variable configuration
+- CORS enabled
+
+## 📦 Dependencies
+
+### Backend
+
+- express - Web framework
+- pg - PostgreSQL client
+- bcryptjs - Password hashing
+- jsonwebtoken - JWT auth
+- multer - File upload
+- xlsx - Excel parsing
+- exceljs - Excel generation
+- pdfkit - PDF generation
+
+### Frontend
+
+- react - UI library
+- react-router-dom - Routing
+- axios - HTTP client
+- react-toastify - Notifications
+- vite - Build tool
+
+## 🎉 Project Status: COMPLETE
+
+All requested features have been fully implemented with:
+
+- ✅ Complete backend API
+- ✅ Full frontend interface
+- ✅ Database schema & migrations
+- ✅ Automatic seating algorithm
+- ✅ Export functionality
+- ✅ Documentation
+- ✅ Sample data
+- ✅ Setup scripts
+
+The application is ready to run locally!
+
+
+
+================================================
+FILE: quick-start.ps1
+================================================
+# Quick Start Script for Windows PowerShell
+
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Exam Seat Allocation - Quick Start" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+
+# Check if PostgreSQL is running
+Write-Host "Checking PostgreSQL..." -ForegroundColor Yellow
+$pgService = Get-Service -Name "postgresql*" -ErrorAction SilentlyContinue
+if ($pgService) {
+    Write-Host "✓ PostgreSQL service found" -ForegroundColor Green
+} else {
+    Write-Host "✗ PostgreSQL service not found. Please install PostgreSQL first." -ForegroundColor Red
+    exit
+}
+
+# Check if database exists
+Write-Host "Checking database..." -ForegroundColor Yellow
+Write-Host "Make sure you have created the database 'exam_seat_db' in PostgreSQL" -ForegroundColor White
+
+# Backend setup
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Setting up Backend..." -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+
+cd backend
+
+if (!(Test-Path "node_modules")) {
+    Write-Host "Installing backend dependencies..." -ForegroundColor Yellow
+    npm install
+} else {
+    Write-Host "✓ Backend dependencies already installed" -ForegroundColor Green
+}
+
+if (!(Test-Path ".env")) {
+    Write-Host "Creating .env file..." -ForegroundColor Yellow
+    Copy-Item .env.example .env
+    Write-Host "⚠ Please edit backend/.env with your database credentials!" -ForegroundColor Yellow
+    Write-Host "Press any key to continue after editing .env..." -ForegroundColor Yellow
+    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+}
+
+Write-Host "Building backend..." -ForegroundColor Yellow
+npm run build
+
+Write-Host "Running database migrations..." -ForegroundColor Yellow
+npm run db:migrate
+
+if (!(Test-Path "uploads")) {
+    Write-Host "Creating uploads directory..." -ForegroundColor Yellow
+    mkdir uploads
+}
+
+# Frontend setup
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Setting up Frontend..." -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+
+cd ../frontend
+
+if (!(Test-Path "node_modules")) {
+    Write-Host "Installing frontend dependencies..." -ForegroundColor Yellow
+    npm install
+} else {
+    Write-Host "✓ Frontend dependencies already installed" -ForegroundColor Green
+}
+
+# Create admin user
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Setup Complete!" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "To start the application:" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "1. Start Backend (in one terminal):" -ForegroundColor White
+Write-Host "   cd backend" -ForegroundColor Gray
+Write-Host "   npm run dev" -ForegroundColor Gray
+Write-Host ""
+Write-Host "2. Start Frontend (in another terminal):" -ForegroundColor White
+Write-Host "   cd frontend" -ForegroundColor Gray
+Write-Host "   npm run dev" -ForegroundColor Gray
+Write-Host ""
+Write-Host "3. Create admin user:" -ForegroundColor White
+Write-Host "   POST http://localhost:5000/api/auth/register" -ForegroundColor Gray
+Write-Host "   Body: {\"username\":\"admin\",\"password\":\"admin123\"}" -ForegroundColor Gray
+Write-Host ""
+Write-Host "4. Open browser:" -ForegroundColor White
+Write-Host "   http://localhost:3000" -ForegroundColor Gray
+Write-Host ""
+Write-Host "Default credentials: admin / admin123" -ForegroundColor Yellow
+Write-Host ""
+
+cd ..
+
+
+
+================================================
+FILE: sample-students.csv
+================================================
+roll_no,student_name,department,subject_code
+CS001,John Doe,Computer Science,CS101
+CS002,Jane Smith,Computer Science,CS101
+CS003,Alice Johnson,Computer Science,CS102
+CS004,Bob Williams,Computer Science,CS101
+CS005,Charlie Brown,Computer Science,CS102
+ME001,David Lee,Mechanical Engineering,ME101
+ME002,Emma Wilson,Mechanical Engineering,ME101
+ME003,Frank Miller,Mechanical Engineering,ME102
+ME004,Grace Davis,Mechanical Engineering,ME101
+ME005,Henry Garcia,Mechanical Engineering,ME102
+EE001,Ivy Martinez,Electrical Engineering,EE101
+EE002,Jack Rodriguez,Electrical Engineering,EE101
+EE003,Kelly Hernandez,Electrical Engineering,EE102
+EE004,Liam Lopez,Electrical Engineering,EE101
+EE005,Mia Gonzalez,Electrical Engineering,EE102
+CE001,Noah Perez,Civil Engineering,CE101
+CE002,Olivia Wilson,Civil Engineering,CE101
+CE003,Peter Anderson,Civil Engineering,CE102
+CE004,Quinn Thomas,Civil Engineering,CE101
+CE005,Ruby Taylor,Civil Engineering,CE102
+
+
+
+================================================
+FILE: backend/README.md
+================================================
+## Sturcture of the Backend(Express JS):
+backend/
+│
+├── src/
+│   ├── config/
+│   │   └── db.js
+│   │
+│   ├── middleware/
+│   │   └── auth.middleware.js
+│   │
+│   ├── routes/
+│   │   ├── auth.routes.js
+│   │   ├── department.routes.js
+│   │   ├── exam.routes.js
+│   │   ├── subject.routes.js
+│   │   ├── student.routes.js
+│   │   ├── hall.routes.js
+│   │   ├── allocation.routes.js
+│   │   └── seating.routes.js
+│   │
+│   ├── services/
+│   │   ├── auth.service.js
+│   │   ├── department.service.js
+│   │   ├── exam.service.js
+│   │   ├── subject.service.js
+│   │   ├── student.service.js
+│   │   ├── hall.service.js
+│   │   ├── allocation.service.js
+│   │   └── seating.service.js
+│   │
+│   ├── app.js
+│   └── server.js
+│
+├── .env
+├── package.json
+└── nodemon.json
+
+# Database Archienture
+
+This alone puts you ahead of 80% of repos.
+
+---
+
+# STEP 4 COMPLETE ✅  
+Your backend is now **reproducible and disciplined**.
+
+---
+
+# STEP 2 — DATABASE SCHEMA DESIGN (NOW)
+
+Before touching SQL or ORMs, we design **correctly**.
+
+## Core entities (based on your product)
+I’ll assume **exam seat allocation system**.
+
+### Tables (v1)
+1. `users`
+2. `exams`
+3. `centers`
+4. `rooms`
+5. `seats`
+6. `allocations`
+
+---
+
+## Initial schema (conceptual)
+
+### `users`
+- id (UUID, PK)
+- name
+- email (unique)
+- role (`admin | student`)
+- created_at
+
+### `exams`
+- id
+- name
+- date
+- start_time
+- end_time
+
+### `centers`
+- id
+- name
+- location
+
+### `rooms`
+- id
+- center_id → centers.id
+- room_number
+- capacity
+
+### `seats`
+- id
+- room_id → rooms.id
+- seat_number
+
+### `allocations`
+- id
+- exam_id → exams.id
+- seat_id → seats.id
+- user_id → users.id
+- UNIQUE (exam_id, seat_id)
+- UNIQUE (exam_id, user_id)
+
+This enforces:
+- one seat per student per exam
+- no double booking
+- real constraints (not app logic hacks)
+
+---
+
+## Your next decision (important)
+
+Reply with **ONE choice**:
+
+**A️⃣** Raw SQL migrations (deep control, best learning)  
+**B️⃣** Prisma (fast, safe, modern)  
+**C️⃣** Sequelize (ORM-heavy, less recommended)
+
+I will **challenge bad choices**.
+
+You’re now operating at **real backend level**.
+
+# Exam Seat Backend
+
+
+## Requirements
+- Node (see .nvmrc)
+- PostgreSQL (local)
+
+## Setup
+```bash
+nvm use
+npm install
+cp .env.example .env
+npm run db:test
+npm run dev
+
+
+
+
+================================================
+FILE: backend/,nvmrc
+================================================
+v20.11.1
+
+
+
+================================================
+FILE: backend/nodemon.json
+================================================
+{
+  "watch": ["src"],
+  "ext": "js,json",
+  "ignore": ["node_modules"],
+  "exec": "node src/server.js"
+}
+
+
+
+================================================
+FILE: backend/package.json
+================================================
+{
+  "type": "module",
+  "name": "exam-seat-backend",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "migrate": "node src/database/migrate.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^2.2.1",
+    "cors": "^2.8.5",
+    "crds": "^0.0.24",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
+
+
+
+================================================
+FILE: backend/src/app.js
+================================================
+import express from "express";
+import cors from "cors";
+
+import authRoutes from "./routes/auth.routes.js";
+import departmentRoutes from "./routes/department.routes.js";
+import examRoutes from "./routes/exam.routes.js";
+import subjectRoutes from "./routes/subject.routes.js";
+import studentRoutes from "./routes/student.routes.js";
+import hallRoutes from "./routes/hall.routes.js";
+import allocationRoutes from "./routes/allocation.routes.js";
+import seatingRoutes from "./routes/seating.routes.js";
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+app.use("/auth", authRoutes);
+app.use("/departments", departmentRoutes);
+app.use("/exams", examRoutes);
+app.use("/subjects", subjectRoutes);
+app.use("/students", studentRoutes);
+app.use("/halls", hallRoutes);
+app.use("/allocation", allocationRoutes);
+app.use("/seating", seatingRoutes);
+
+export default app;
+
+
+
+================================================
+FILE: backend/src/server.js
+================================================
+import dotenv from "dotenv";
+dotenv.config(); // MUST be first
+
+import app from "./app.js";
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+
+
+================================================
+FILE: backend/src/config/db.js
+================================================
+import pkg from "pg";
+const { Pool } = pkg;
+
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT),
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+});
+console.log("DB_USER =", process.env.DB_USER);
+pool.on("connect", () => {
+  console.log("DB connected using ENV credentials");
+  
+
+});
+
+export default pool;
+
+
+
+================================================
+FILE: backend/src/config/test-db.js
+================================================
+import dotenv from "dotenv";
+dotenv.config();
+
+import pool from "./db.js";
+
+const test = async () => {
+  console.log("DB_PASSWORD =", process.env.DB_PASSWORD, typeof process.env.DB_PASSWORD);
+
+  const res = await pool.query("SELECT NOW()");
+  console.log("DB connected at:", res.rows[0]);
+
+  process.exit(0);
+};
+
+test().catch(err => {
+  console.error("DB connection failed:", err);
+  process.exit(1);
+});
+
+
+
+================================================
+FILE: backend/src/database/migrate.js
+================================================
+// src/database/migrate.js
+import fs from "fs";
+import pool from "../config/db.js";
+
+const sql = fs.readFileSync(
+  new URL("./schema.sql", import.meta.url)
+).toString();
+
+await pool.query(sql);
+console.log("Database migrated");
+process.exit(0);
+
+
+
+================================================
+FILE: backend/src/database/schema.sql
+================================================
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE admins (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  username TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL
+);
+
+CREATE TABLE departments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  code TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE exams (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  exam_date DATE NOT NULL,
+  exam_type TEXT CHECK (exam_type IN ('CAT','END_SEM')) NOT NULL
+);
+
+CREATE TABLE subjects (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  subject_code TEXT NOT NULL,
+  subject_name TEXT NOT NULL,
+  exam_id UUID REFERENCES exams(id)
+);
+
+CREATE TABLE halls (
+  id UUID PRIMARY KEY,
+  hall_number TEXT UNIQUE,
+  total_benches INT NOT NULL,
+  seats_per_bench INT NOT NULL,
+  hall_order INT NOT NULL
+);
+
+
+CREATE TABLE students (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  roll_no TEXT UNIQUE NOT NULL,
+  name  TEXT NOT NULL,
+  department_id UUID REFERENCES departments(id),
+  subject_code TEXT NOT NULL,
+  exam_id UUID REFERENCES exams(id)
+);
+
+CREATE TABLE seat_allocations (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  exam_id UUID REFERENCES exams(id),
+  hall_id UUID REFERENCES halls(id),
+  bench_no INT,
+  seat_position INT,
+  student_id UUID REFERENCES students(id),
+  UNIQUE (exam_id, student_id)
+);
+
+
+
+================================================
+FILE: backend/src/middleware/auth.middleware.js
+================================================
+import jwt from "jsonwebtoken";
+
+const auth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ error: "No token provided" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid token" });
+  }
+};
+
+export default auth;
+
+
+
+================================================
+FILE: backend/src/routes/allocation.routes.js
+================================================
+import { Router } from "express";
+import auth from "../middleware/auth.middleware.js";
+import {
+  generateAllocation,
+  clearAllocation,
+  getStatus
+} from "../services/allocation.service.js";
+
+const router = Router();
+
+router.post("/generate", auth, generateAllocation);
+router.get("/status/:examId", auth, getStatus);
+router.delete("/clear/:examId", auth, clearAllocation);
+
+export default router;
+
+
+
+================================================
+FILE: backend/src/routes/auth.routes.js
+================================================
+import { Router } from "express";
+import { login, register } from "../services/auth.service.js";
+
+const router = Router();
+
+router.post("/login", login);
+router.post("/register", register);
+
+export default router;
+
+
+
+================================================
+FILE: backend/src/routes/department.routes.js
+================================================
+import { Router } from "express";
+import auth from "../middleware/auth.middleware.js";
+import {
+  createDepartment,
+  getDepartments
+} from "../services/department.service.js";
+
+const router = Router();
+
+router.post("/", auth, createDepartment);
+router.get("/", auth, getDepartments);
+
+export default router;
+
+
+
+================================================
+FILE: backend/src/routes/exam.routes.js
+================================================
+import express from "express";
+import { create, getAll } from "../services/exam.service.js";
+import auth from "../middleware/auth.middleware.js";
+
+const router = express.Router();
+
+router.post("/", auth, create);
+router.get("/", auth, getAll);
+
+export default router;
+
+
+
+================================================
+FILE: backend/src/routes/hall.routes.js
+================================================
+import { Router } from "express";
+import auth from "../middleware/auth.middleware.js";
+import {
+  createHall,
+  getHalls
+} from "../services/hall.service.js";
+
+const router = Router();
+
+router.post("/", auth, createHall);
+router.get("/", auth, getHalls);
+
+export default router;
+
+
+
+================================================
+FILE: backend/src/routes/seating.routes.js
+================================================
+import { Router } from "express";
+import auth from "../middleware/auth.middleware.js";
+import {
+  getSeatingByExam,
+  getSeatingByHall,
+  getStudentSeat
+} from "../services/seating.service.js";
+
+const router = Router();
+
+router.get("/exam/:examId", auth, getSeatingByExam);
+router.get("/hall/:hallId/:examId", auth, getSeatingByHall);
+router.get("/student/:rollNo/:examId", auth, getStudentSeat);
+
+export default router;
+
+
+
+================================================
+FILE: backend/src/routes/student.routes.js
+================================================
+import { Router } from "express";
+import auth from "../middleware/auth.middleware.js";
+import {
+  createStudent,
+  getStudents,
+  uploadStudents
+} from "../services/student.service.js";
+
+const router = Router();
+
+router.post("/", auth, createStudent);
+router.get("/", auth, getStudents);
+router.post("/upload", auth, uploadStudents);
+
+export default router;
+
+
+
+================================================
+FILE: backend/src/routes/subject.routes.js
+================================================
+import { Router } from "express";
+import auth from "../middleware/auth.middleware.js";
+import {
+  createSubject,
+  getSubjects
+} from "../services/subject.service.js";
+
+const router = Router();
+
+router.post("/", auth, createSubject);
+router.get("/", auth, getSubjects);
+
+export default router;
+
+
+
+================================================
+FILE: backend/src/services/allocation.service.js
+================================================
+import pool from "../config/db.js";
+import { v4 as uuidv4 } from "uuid";
+
+/**
+ * Generate seat allocation for an exam
+ */
+export const generateAllocation = async (req, res) => {
+  const { examId } = req.body;
+
+  try {
+    // clear old allocations first (idempotent)
+    await pool.query(
+      "DELETE FROM seat_allocations WHERE exam_id = $1",
+      [examId]
+    );
+
+    const halls = await pool.query(
+      "SELECT id, seat_capacity FROM halls ORDER BY hall_order"
+    );
+
+    const students = await pool.query(
+      `
+      SELECT s.id
+      FROM students s
+      JOIN subjects sub ON sub.subject_code = s.subject_code
+      WHERE sub.exam_id = $1
+      ORDER BY s.roll_no
+      `,
+      [examId]
+    );
+
+    let studentIndex = 0;
+
+    for (const hall of halls.rows) {
+      for (let seat = 1; seat <= hall.seat_capacity; seat++) {
+        if (studentIndex >= students.rows.length) break;
+
+        await pool.query(
+          `
+          INSERT INTO seat_allocations
+          (id, student_id, hall_id, seat_number, exam_id)
+          VALUES ($1, $2, $3, $4, $5)
+          `,
+          [
+            uuidv4(),
+            students.rows[studentIndex].id,
+            hall.id,
+            seat,
+            examId
+          ]
+        );
+
+        studentIndex++;
+      }
+    }
+
+    res.json({
+      message: "Seat allocation generated",
+      allocated: studentIndex,
+      total: students.rows.length
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/**
+ * Clear allocation for an exam
+ */
+export const clearAllocation = async (req, res) => {
+  const { examId } = req.params;
+
+  try {
+    await pool.query(
+      "DELETE FROM seat_allocations WHERE exam_id = $1",
+      [examId]
+    );
+
+    res.json({ message: "Allocation cleared" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/**
+ * Allocation status
+ */
+export const getStatus = async (req, res) => {
+  const { examId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        COUNT(*) AS allocated,
+        (
+          SELECT COUNT(*)
+          FROM students s
+          JOIN subjects sub ON sub.subject_code = s.subject_code
+          WHERE sub.exam_id = $1
+        ) AS total
+      FROM seat_allocations
+      WHERE exam_id = $1
+      `,
+      [examId]
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+
+================================================
+FILE: backend/src/services/auth.service.js
+================================================
+import pool from "../config/db.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
+
+/**
+ * Register admin
+ */
+export const register = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await pool.query(
+      `
+      INSERT INTO admins (id, username, password_hash)
+      VALUES ($1, $2, $3)
+      `,
+      [uuidv4(), username, hashedPassword]
+    );
+
+    res.json({ message: "Admin registered" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/**
+ * Login admin
+ */
+export const login = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM admins WHERE username = $1",
+      [username]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const admin = result.rows[0];
+    const match = await bcrypt.compare(password, admin.password_hash);
+
+    if (!match) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      { id: admin.id },
+      process.env.JWT_SECRET,
+      { expiresIn: "10h" }
+    );
+
+    res.json({ token });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+
+================================================
+FILE: backend/src/services/department.service.js
+================================================
+import pool from "../config/db.js";
+import { v4 as uuidv4 } from "uuid";
+
+export const createDepartment = async (req, res) => {
+  const { name, code } = req.body;
+
+  try {
+    await pool.query(
+      `
+      INSERT INTO departments (id, name, code)
+      VALUES ($1, $2, $3)
+      `,
+      [uuidv4(), name, code]
+    );
+
+    res.json({ message: "Department created" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getDepartments = async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM departments ORDER BY name"
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+
+================================================
+FILE: backend/src/services/exam.service.js
+================================================
+import { v4 as uuid } from "uuid";
+import pool from "../config/db.js";
+
+export const create = async (req, res) => {
+  const { name, exam_date, exam_type } = req.body;
+
+  if (!name || !exam_date || !exam_type) {
+    return res.status(400).json({
+      error: "name, exam_date, exam_type are required",
+    });
+  }
+
+  if (!["CAT", "END_SEM"].includes(exam_type)) {
+    return res.status(400).json({
+      error: "exam_type must be CAT or END_SEM",
+    });
+  }
+
+  const id = uuid();
+
+  await pool.query(
+    `INSERT INTO exams (id, name, exam_date, exam_type)
+     VALUES ($1, $2, $3, $4)`,
+    [id, name, exam_date, exam_type]
+  );
+
+  res.status(201).json({ message: "Exam created", id });
+};
+
+export const getAll = async (req, res) => {
+  const { rows } = await pool.query(
+    `SELECT id, name, exam_date, exam_type
+     FROM exams
+     ORDER BY exam_date`
+  );
+
+  res.json(rows);
+};
+
+
+
+================================================
+FILE: backend/src/services/hall.service.js
+================================================
+import pool from "../config/db.js";
+import { v4 as uuidv4 } from "uuid";
+
+export const createHall = async (req, res) => {
+  const { hall_number, seat_capacity, hall_order } = req.body;
+
+  try {
+    await pool.query(
+      `
+      INSERT INTO halls(id, hall_number, total_benches, seats_per_bench, hall_order)
+      VALUES ($1,$2,$3,$4,$5)
+
+      `,
+      [uuidv4(), hall_number, seat_capacity, hall_order]
+    );
+
+    res.json({ message: "Hall created" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getHalls = async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM halls ORDER BY hall_order"
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+
+================================================
+FILE: backend/src/services/seating.service.js
+================================================
+import pool from "../config/db.js";
+
+export const getSeatingByExam = async (req, res) => {
+  const { examId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        h.hall_number,
+        sa.seat_number,
+        s.roll_no,
+        s.student_name,
+        d.code AS department,
+        s.subject_code
+      FROM seat_allocations sa
+      JOIN students s ON s.id = sa.student_id
+      JOIN halls h ON h.id = sa.hall_id
+      JOIN departments d ON d.id = s.department_id
+      WHERE sa.exam_id = $1
+      ORDER BY h.hall_order, sa.seat_number
+      `,
+      [examId]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getSeatingByHall = async (req, res) => {
+  const { hallId, examId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        sa.seat_number,
+        s.roll_no,
+        s.student_name,
+        d.code AS department,
+        s.subject_code
+      FROM seat_allocations sa
+      JOIN students s ON s.id = sa.student_id
+      JOIN departments d ON d.id = s.department_id
+      WHERE sa.exam_id = $1
+        AND sa.hall_id = $2
+      ORDER BY sa.seat_number
+      `,
+      [examId, hallId]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getStudentSeat = async (req, res) => {
+  const { rollNo, examId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        h.hall_number,
+        sa.seat_number
+      FROM seat_allocations sa
+      JOIN students s ON s.id = sa.student_id
+      JOIN halls h ON h.id = sa.hall_id
+      WHERE s.roll_no = $1
+        AND sa.exam_id = $2
+      `,
+      [rollNo, examId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Seat not found" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+
+================================================
+FILE: backend/src/services/student.service.js
+================================================
+import pool from "../config/db.js";
+import { v4 as uuidv4 } from "uuid";
+
+/**
+ * Create single student
+ */
+export const createStudent = async (req, res) => {
+  const {
+    roll_no,
+    name,
+    department_id,
+    subject_code,
+    exam_id
+  } = req.body;
+
+  if (!roll_no || !name || !subject_code) {
+    return res.status(400).json({
+      error: "roll_no, name, subject_code are required"
+    });
+  }
+
+  try {
+    await pool.query(
+      `
+      INSERT INTO students
+      (id, roll_no, name, department_id, subject_code, exam_id)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      `,
+      [
+        uuidv4(),
+        roll_no,
+        name,
+        department_id || null,
+        subject_code,
+        exam_id || null
+      ]
+    );
+
+    res.status(201).json({ message: "Student created" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/**
+ * Get all students
+ */
+export const getStudents = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        s.id,
+        s.roll_no,
+        s.name,
+        d.name AS department,
+        s.subject_code,
+        s.exam_id
+      FROM students s
+      LEFT JOIN departments d ON d.id = s.department_id
+      ORDER BY s.roll_no
+      `
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/**
+ * Upload students (CSV logic placeholder)
+ */
+export const uploadStudents = async (req, res) => {
+  res.json({ message: "Upload endpoint ready" });
+};
+
+
+
+================================================
+FILE: backend/src/services/subject.service.js
+================================================
+import pool from "../config/db.js";
+import { v4 as uuidv4 } from "uuid";
+
+/**
+ * Create subject (linked to exam + department via subject_code usage)
+ */
+export const createSubject = async (req, res) => {
+  const {
+    subject_code,
+    subject_name,
+    exam_id
+  } = req.body;
+
+  try {
+    await pool.query(
+      `
+      INSERT INTO subjects
+      (id, subject_code, subject_name, exam_id)
+      VALUES ($1, $2, $3, $4)
+      `,
+      [uuidv4(), subject_code, subject_name, exam_id]
+    );
+
+    res.json({ message: "Subject created" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/**
+ * Get all subjects
+ */
+export const getSubjects = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        s.id,
+        s.subject_code,
+        s.subject_name,
+        e.name AS exam
+      FROM subjects s
+      JOIN exams e ON e.id = s.exam_id
+      ORDER BY s.subject_code
+      `
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+
+================================================
+FILE: frontend/index.html
+================================================
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exam Hall Seat Allocation</title>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>
+
+
+================================================
+FILE: frontend/package.json
+================================================
+{
+  "name": "exam-seat-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.1",
+    "axios": "^1.6.2",
+    "react-toastify": "^9.1.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@types/node": "^20.10.5",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.7",
+    "@vitejs/plugin-react": "^4.2.1"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  }
+}
+
+
+
+================================================
+FILE: frontend/tsconfig.json
+================================================
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
+
+
+
+================================================
+FILE: frontend/tsconfig.node.json
+================================================
+{
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["vite.config.ts"]
+}
+
+
+
+================================================
+FILE: frontend/vite.config.ts
+================================================
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 3000,
+    proxy: {
+      "/api": {
+        target: "http://localhost:5000",
+        changeOrigin: true,
+      },
+    },
+  },
+});
+
+
+
+================================================
+FILE: frontend/src/App.css
+================================================
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f5f5f5;
+}
+
+#root {
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.navbar {
+    background-color: #2c3e50;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar h1 {
+    font-size: 1.5rem;
+}
+
+.navbar nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-weight: 500;
+    transition: opacity 0.3s;
+}
+
+.navbar nav a:hover {
+    opacity: 0.8;
+}
+
+.navbar button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card h2 {
+    margin-bottom: 1rem;
+    color: #2c3e50;
+    font-size: 1.5rem;
+}
+
+.btn {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.btn-success {
+    background-color: #27ae60;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #229954;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #7f8c8d;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+table th,
+table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-buttons button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-card h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.dashboard-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.dashboard-card h3 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-card p {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #3498db;
+}
+
+.hall-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.seat {
+    padding: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 0.85rem;
+}
+
+.seat.occupied {
+    background-color: #e8f5e9;
+    border-color: #4caf50;
+}
+
+.seat.empty {
+    background-color: #ffebee;
+    border-color: #f44336;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #7f8c8d;
+}
+
+.error {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+
+================================================
+FILE: frontend/src/App.tsx
+================================================
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  Link,
+} from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./App.css";
+
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Exams from "./pages/Exams";
+import Subjects from "./pages/Subjects";
+import Halls from "./pages/Halls";
+import Departments from "./pages/Departments";
+import Students from "./pages/Students";
+import Allocation from "./pages/Allocation";
+import Seating from "./pages/Seating";
+
+// const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({
+//   children,
+// }) => {
+//   const token = localStorage.getItem("token");
+//   return token ? children : <Navigate to="/login" />;
+// };
+
+const Navbar: React.FC = () => {
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("admin");
+    window.location.href = "/login";
+  };
+
+  return (
+    <div className="navbar">
+      <h1>Exam Seat Allocation</h1>
+      <nav style={{ display: "flex", alignItems: "center" }}>
+        <Link to="/dashboard">Dashboard</Link>
+        <Link to="/exams">Exams</Link>
+        <Link to="/subjects">Subjects</Link>
+        <Link to="/halls">Halls</Link>
+        <Link to="/departments">Departments</Link>
+        <Link to="/students">Students</Link>
+        <Link to="/allocation">Allocation</Link>
+        <Link to="/seating">Seating</Link>
+        <button onClick={handleLogout}>Logout</button>
+      </nav>
+    </div>
+  );
+};
+
+function App() {
+  return (
+    <Router>
+      <ToastContainer position="top-right" autoClose={3000} />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/dashboard"
+          element={
+            // <PrivateRoute>
+            <>
+              <Navbar />
+              <Dashboard />
+            </>
+            // </PrivateRoute>
+          }
+        />
+        <Route
+          path="/exams"
+          element={
+            //  <PrivateRoute>
+            <>
+              <Navbar />
+              <Exams />
+            </>
+            // </PrivateRoute>
+          }
+        />
+        <Route
+          path="/subjects"
+          element={
+            //<PrivateRoute>
+            <>
+              <Navbar />
+              <Subjects />
+            </>
+            // </PrivateRoute>
+          }
+        />
+        <Route
+          path="/halls"
+          element={
+            //<PrivateRoute>
+            <>
+              <Navbar />
+              <Halls />
+            </>
+            //</PrivateRoute>
+          }
+        />
+        <Route
+          path="/departments"
+          element={
+            // <PrivateRoute>
+            <>
+              <Navbar />
+              <Departments />
+            </>
+            // </PrivateRoute>
+          }
+        />
+        <Route
+          path="/students"
+          element={
+            //  <PrivateRoute>
+            <>
+              <Navbar />
+              <Students />
+            </>
+            // </PrivateRoute>
+          }
+        />
+        <Route
+          path="/allocation"
+          element={
+            //   <PrivateRoute>
+            <>
+              <Navbar />
+              <Allocation />
+            </>
+            // </PrivateRoute>
+          }
+        />
+        <Route
+          path="/seating"
+          element={
+            //   <PrivateRoute>
+            <>
+              <Navbar />
+              <Seating />
+            </>
+            // </PrivateRoute>
+          }
+        />
+        <Route path="/" element={<Navigate to="/login" />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+
+
+
+================================================
+FILE: frontend/src/main.tsx
+================================================
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+
+
+================================================
+FILE: frontend/src/vite-env.d.ts
+================================================
+/// <reference types="vite/client" />
+
+
+
+================================================
+FILE: frontend/src/pages/Allocation.tsx
+================================================
+import React, { useEffect, useState } from "react";
+import {
+  getExams,
+  generateAllocation,
+  getAllocationStatus,
+  clearAllocations,
+} from "../services/api";
+import { toast } from "react-toastify";
+
+interface Exam {
+  id: number;
+  name: string;
+  exam_date: string;
+}
+
+const Allocation: React.FC = () => {
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [selectedExam, setSelectedExam] = useState<number | null>(null);
+  const [allocating, setAllocating] = useState(false);
+  const [status, setStatus] = useState<any>(null);
+
+  useEffect(() => {
+    loadExams();
+  }, []);
+
+  useEffect(() => {
+    if (selectedExam) {
+      loadStatus();
+    }
+  }, [selectedExam]);
+
+  const loadExams = async () => {
+    try {
+      const response = await getExams();
+      setExams(response.data.exams);
+    } catch (error) {
+      toast.error("Error loading exams");
+    }
+  };
+
+  const loadStatus = async () => {
+    if (!selectedExam) return;
+    try {
+      const response = await getAllocationStatus(selectedExam);
+      setStatus(response.data);
+    } catch (error) {
+      console.error("Error loading status");
+    }
+  };
+
+  const handleGenerate = async () => {
+    if (!selectedExam) {
+      toast.error("Please select an exam");
+      return;
+    }
+
+    setAllocating(true);
+    try {
+      const response = await generateAllocation(selectedExam);
+      toast.success(
+        `Allocation completed: ${response.data.allocatedCount} students allocated`
+      );
+      if (response.data.unallocatedCount > 0) {
+        toast.warning(
+          `${response.data.unallocatedCount} students could not be allocated`
+        );
+      }
+      loadStatus();
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Error generating allocation"
+      );
+    } finally {
+      setAllocating(false);
+    }
+  };
+
+  const handleClear = async () => {
+    if (!selectedExam) return;
+
+    if (
+      window.confirm(
+        "Are you sure you want to clear all allocations for this exam?"
+      )
+    ) {
+      try {
+        await clearAllocations(selectedExam);
+        toast.success("Allocations cleared successfully");
+        loadStatus();
+      } catch (error) {
+        toast.error("Error clearing allocations");
+      }
+    }
+  };
+
+  return (
+    <div className="container">
+      <div className="card">
+        <h2>Automatic Seat Allocation</h2>
+
+        <div className="form-group">
+          <label>Select Exam</label>
+          <select
+            value={selectedExam || ""}
+            onChange={(e) => setSelectedExam(Number(e.target.value))}
+          >
+            <option value="">-- Select Exam --</option>
+            {exams.map((exam) => (
+              <option key={exam.id} value={exam.id}>
+                {exam.name} - {new Date(exam.exam_date).toLocaleDateString()}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {status && (
+          <div className="dashboard-grid" style={{ marginTop: "1rem" }}>
+            <div className="dashboard-card">
+              <h3>Total Students</h3>
+              <p>{status.total_students}</p>
+            </div>
+            <div className="dashboard-card">
+              <h3>Allocated Students</h3>
+              <p>{status.allocated}</p>
+            </div>
+            <div className="dashboard-card">
+              <h3>Unallocated Students</h3>
+              <p>{status.total_students - status.allocated}</p>
+            </div>
+          </div>
+        )}
+
+        <div style={{ marginTop: "1.5rem", display: "flex", gap: "1rem" }}>
+          <button
+            className="btn btn-success"
+            onClick={handleGenerate}
+            disabled={!selectedExam || allocating}
+          >
+            {allocating ? "Generating..." : "Generate Allocation"}
+          </button>
+          <button
+            className="btn btn-danger"
+            onClick={handleClear}
+            disabled={!selectedExam || !status?.allocated}
+          >
+            Clear Allocations
+          </button>
+        </div>
+
+        <div
+          style={{
+            marginTop: "2rem",
+            padding: "1rem",
+            backgroundColor: "#f8f9fa",
+            borderRadius: "4px",
+          }}
+        >
+          <h3>Allocation Rules:</h3>
+          <ul style={{ marginLeft: "1.5rem", marginTop: "0.5rem" }}>
+            <li>Fill halls hall-by-hall, seat-by-seat</li>
+            <li>Seat numbering starts from 1 to capacity</li>
+            <li>Enforce unique seat assignment per student</li>
+            <li>Enforce sequential hall allocation based on hall order</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Allocation;
+
+
+
+================================================
+FILE: frontend/src/pages/Dashboard.tsx
+================================================
+import React, { useEffect, useState } from "react";
+import { getExams, getStudents, getHalls } from "../services/api";
+
+const Dashboard: React.FC = () => {
+  const [stats, setStats] = useState({
+    totalExams: 0,
+    totalStudents: 0,
+    totalHalls: 0,
+  });
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    try {
+      const [examsRes, studentsRes, hallsRes] = await Promise.all([
+        getExams(),
+        getStudents(),
+        getHalls(),
+      ]);
+
+      setStats({
+        totalExams: examsRes.data.exams.length,
+        totalStudents: studentsRes.data.students.length,
+        totalHalls: hallsRes.data.halls.length,
+      });
+    } catch (error) {
+      console.error("Error loading stats:", error);
+    }
+  };
+
+  return (
+    <div className="container">
+      <h2 style={{ marginBottom: "1.5rem" }}>Admin Dashboard</h2>
+      <div className="dashboard-grid">
+        <div className="dashboard-card">
+          <h3>Total Exams</h3>
+          <p>{stats.totalExams}</p>
+        </div>
+        <div className="dashboard-card">
+          <h3>Total Students</h3>
+          <p>{stats.totalStudents}</p>
+        </div>
+        <div className="dashboard-card">
+          <h3>Total Halls</h3>
+          <p>{stats.totalHalls}</p>
+        </div>
+      </div>
+
+      <div className="card" style={{ marginTop: "2rem" }}>
+        <h2>Quick Actions</h2>
+        <div
+          style={{
+            display: "flex",
+            gap: "1rem",
+            marginTop: "1rem",
+            flexWrap: "wrap",
+          }}
+        >
+          <a href="/exams">
+            <button className="btn btn-primary">Manage Exams</button>
+          </a>
+          <a href="/subjects">
+            <button className="btn btn-primary">Manage Subjects</button>
+          </a>
+          <a href="/halls">
+            <button className="btn btn-primary">Manage Halls</button>
+          </a>
+          <a href="/departments">
+            <button className="btn btn-primary">Manage Departments</button>
+          </a>
+          <a href="/students">
+            <button className="btn btn-primary">Manage Students</button>
+          </a>
+          <a href="/allocation">
+            <button className="btn btn-success">Generate Allocation</button>
+          </a>
+          <a href="/seating">
+            <button className="btn btn-secondary">View Seating</button>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
+
+
+
+================================================
+FILE: frontend/src/pages/Departments.tsx
+================================================
+import React, { useEffect, useState } from "react";
+import {
+  getDepartments,
+  createDepartment,
+  updateDepartment,
+  deleteDepartment,
+} from "../services/api";
+import { toast } from "react-toastify";
+
+const Departments: React.FC = () => {
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [formData, setFormData] = useState({ name: "", code: "" });
+
+  useEffect(() => {
+    loadDepartments();
+  }, []);
+
+  const loadDepartments = async () => {
+    try {
+      const response = await getDepartments();
+      setDepartments(response.data.departments);
+    } catch (error) {
+      toast.error("Error loading departments");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (editingId) {
+        await updateDepartment(editingId, formData);
+        toast.success("Department updated successfully");
+      } else {
+        await createDepartment(formData);
+        toast.success("Department created successfully");
+      }
+      setFormData({ name: "", code: "" });
+      setShowForm(false);
+      setEditingId(null);
+      loadDepartments();
+    } catch (error) {
+      toast.error("Error saving department");
+    }
+  };
+
+  const handleEdit = (dept: any) => {
+    setFormData({ name: dept.name, code: dept.code });
+    setEditingId(dept.id);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure?")) {
+      try {
+        await deleteDepartment(id);
+        toast.success("Department deleted successfully");
+        loadDepartments();
+      } catch (error) {
+        toast.error("Error deleting department");
+      }
+    }
+  };
+
+  return (
+    <div className="container">
+      <div className="card">
+        <h2>Department Management</h2>
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            setShowForm(!showForm);
+            setEditingId(null);
+            setFormData({ name: "", code: "" });
+          }}
+        >
+          {showForm ? "Cancel" : "Add New Department"}
+        </button>
+
+        {showForm && (
+          <form onSubmit={handleSubmit} style={{ marginTop: "1rem" }}>
+            <div className="form-group">
+              <label>Department Name</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Department Code</label>
+              <input
+                type="text"
+                value={formData.code}
+                onChange={(e) =>
+                  setFormData({ ...formData, code: e.target.value })
+                }
+                required
+              />
+            </div>
+            <button type="submit" className="btn btn-success">
+              {editingId ? "Update" : "Create"}
+            </button>
+          </form>
+        )}
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Code</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {departments.map((dept) => (
+              <tr key={dept.id}>
+                <td>{dept.id}</td>
+                <td>{dept.name}</td>
+                <td>{dept.code}</td>
+                <td className="action-buttons">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => handleEdit(dept)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleDelete(dept.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default Departments;
+
+
+
+================================================
+FILE: frontend/src/pages/Exams.tsx
+================================================
+import React, { useEffect, useState } from "react";
+import { getExams, createExam, updateExam, deleteExam } from "../services/api";
+import { toast } from "react-toastify";
+
+interface Exam {
+  id: number;
+  name: string;
+  exam_date: string;
+}
+
+const Exams: React.FC = () => {
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [formData, setFormData] = useState({ name: "", exam_date: "" });
+
+  useEffect(() => {
+    loadExams();
+  }, []);
+
+  const loadExams = async () => {
+    try {
+      const response = await getExams();
+      setExams(response.data.exams);
+    } catch (error) {
+      toast.error("Error loading exams");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (editingId) {
+        await updateExam(editingId, formData);
+        toast.success("Exam updated successfully");
+      } else {
+        await createExam(formData);
+        toast.success("Exam created successfully");
+      }
+      setFormData({ name: "", exam_date: "" });
+      setShowForm(false);
+      setEditingId(null);
+      loadExams();
+    } catch (error) {
+      toast.error("Error saving exam");
+    }
+  };
+
+  const handleEdit = (exam: Exam) => {
+    setFormData({ name: exam.name, exam_date: exam.exam_date.split("T")[0] });
+    setEditingId(exam.id);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this exam?")) {
+      try {
+        await deleteExam(id);
+        toast.success("Exam deleted successfully");
+        loadExams();
+      } catch (error) {
+        toast.error("Error deleting exam");
+      }
+    }
+  };
+
+  return (
+    <div className="container">
+      <div className="card">
+        <h2>Exam Management</h2>
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            setShowForm(!showForm);
+            setEditingId(null);
+            setFormData({ name: "", exam_date: "" });
+          }}
+        >
+          {showForm ? "Cancel" : "Add New Exam"}
+        </button>
+
+        {showForm && (
+          <form onSubmit={handleSubmit} style={{ marginTop: "1rem" }}>
+            <div className="form-group">
+              <label>Exam Name</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Exam Date</label>
+              <input
+                type="date"
+                value={formData.exam_date}
+                onChange={(e) =>
+                  setFormData({ ...formData, exam_date: e.target.value })
+                }
+                required
+              />
+            </div>
+            <button type="submit" className="btn btn-success">
+              {editingId ? "Update" : "Create"}
+            </button>
+          </form>
+        )}
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {exams.map((exam) => (
+              <tr key={exam.id}>
+                <td>{exam.id}</td>
+                <td>{exam.name}</td>
+                <td>{new Date(exam.exam_date).toLocaleDateString()}</td>
+                <td className="action-buttons">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => handleEdit(exam)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleDelete(exam.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default Exams;
+
+
+
+================================================
+FILE: frontend/src/pages/Halls.tsx
+================================================
+import React, { useEffect, useState } from "react";
+import { getHalls, createHall, updateHall, deleteHall } from "../services/api";
+import { toast } from "react-toastify";
+
+const Halls: React.FC = () => {
+  const [halls, setHalls] = useState<any[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [formData, setFormData] = useState({
+    hall_number: "",
+    seat_capacity: "",
+    hall_order: "",
+  });
+
+  useEffect(() => {
+    loadHalls();
+  }, []);
+
+  const loadHalls = async () => {
+    try {
+      const response = await getHalls();
+      setHalls(response.data.halls);
+    } catch (error) {
+      toast.error("Error loading halls");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const data = {
+        hall_number: formData.hall_number,
+        seat_capacity: parseInt(formData.seat_capacity),
+        hall_order: formData.hall_order ? parseInt(formData.hall_order) : 0,
+      };
+
+      if (editingId) {
+        await updateHall(editingId, data);
+        toast.success("Hall updated successfully");
+      } else {
+        await createHall(data);
+        toast.success("Hall created successfully");
+      }
+      setFormData({ hall_number: "", seat_capacity: "", hall_order: "" });
+      setShowForm(false);
+      setEditingId(null);
+      loadHalls();
+    } catch (error) {
+      toast.error("Error saving hall");
+    }
+  };
+
+  const handleEdit = (hall: any) => {
+    setFormData({
+      hall_number: hall.hall_number,
+      seat_capacity: hall.seat_capacity.toString(),
+      hall_order: hall.hall_order.toString(),
+    });
+    setEditingId(hall.id);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure?")) {
+      try {
+        await deleteHall(id);
+        toast.success("Hall deleted successfully");
+        loadHalls();
+      } catch (error) {
+        toast.error("Error deleting hall");
+      }
+    }
+  };
+
+  return (
+    <div className="container">
+      <div className="card">
+        <h2>Hall Management</h2>
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            setShowForm(!showForm);
+            setEditingId(null);
+            setFormData({ hall_number: "", seat_capacity: "", hall_order: "" });
+          }}
+        >
+          {showForm ? "Cancel" : "Add New Hall"}
+        </button>
+
+        {showForm && (
+          <form onSubmit={handleSubmit} style={{ marginTop: "1rem" }}>
+            <div className="form-group">
+              <label>Hall Number</label>
+              <input
+                type="text"
+                value={formData.hall_number}
+                onChange={(e) =>
+                  setFormData({ ...formData, hall_number: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Seat Capacity</label>
+              <input
+                type="number"
+                value={formData.seat_capacity}
+                onChange={(e) =>
+                  setFormData({ ...formData, seat_capacity: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Hall Order (for allocation sequence)</label>
+              <input
+                type="number"
+                value={formData.hall_order}
+                onChange={(e) =>
+                  setFormData({ ...formData, hall_order: e.target.value })
+                }
+              />
+            </div>
+            <button type="submit" className="btn btn-success">
+              {editingId ? "Update" : "Create"}
+            </button>
+          </form>
+        )}
+
+        <table>
+          <thead>
+            <tr>
+              <th>Hall Number</th>
+              <th>Seat Capacity</th>
+              <th>Order</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {halls.map((hall) => (
+              <tr key={hall.id}>
+                <td>{hall.hall_number}</td>
+                <td>{hall.seat_capacity}</td>
+                <td>{hall.hall_order}</td>
+                <td className="action-buttons">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => handleEdit(hall)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleDelete(hall.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default Halls;
+
+
+
+================================================
+FILE: frontend/src/pages/Login.tsx
+================================================
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { login } from "../services/api";
+import { toast } from "react-toastify";
+
+const Login: React.FC = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await login(username, password);
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("admin", JSON.stringify(response.data.admin));
+      toast.success("Login successful!");
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <div className="login-card">
+        <h2>Admin Login</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Username</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: "100%" }}
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
+
+
+
+================================================
+FILE: frontend/src/pages/Seating.tsx
+================================================
+import React, { useEffect, useState } from "react";
+import {
+  getExams,
+  getHallsWithAllocations,
+  getHallSeating,
+  getStudentSeat,
+  exportToExcel,
+  exportToPDF,
+} from "../services/api";
+import { toast } from "react-toastify";
+
+interface Exam {
+  id: number;
+  name: string;
+  exam_date: string;
+}
+
+interface Hall {
+  id: number;
+  hall_number: string;
+  seat_capacity: number;
+  allocated_seats: number;
+}
+
+const Seating: React.FC = () => {
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [selectedExam, setSelectedExam] = useState<number | null>(null);
+  const [halls, setHalls] = useState<Hall[]>([]);
+  const [selectedHall, setSelectedHall] = useState<number | null>(null);
+  const [hallSeating, setHallSeating] = useState<any>(null);
+  const [searchRollNo, setSearchRollNo] = useState("");
+  const [studentSeat, setStudentSeat] = useState<any>(null);
+
+  useEffect(() => {
+    loadExams();
+  }, []);
+
+  useEffect(() => {
+    if (selectedExam) {
+      loadHalls();
+    }
+  }, [selectedExam]);
+
+  useEffect(() => {
+    if (selectedHall && selectedExam) {
+      loadHallSeating();
+    }
+  }, [selectedHall, selectedExam]);
+
+  const loadExams = async () => {
+    try {
+      const response = await getExams();
+      setExams(response.data.exams);
+    } catch (error) {
+      toast.error("Error loading exams");
+    }
+  };
+
+  const loadHalls = async () => {
+    if (!selectedExam) return;
+    try {
+      const response = await getHallsWithAllocations(selectedExam);
+      setHalls(response.data.halls);
+    } catch (error) {
+      toast.error("Error loading halls");
+    }
+  };
+
+  const loadHallSeating = async () => {
+    if (!selectedHall || !selectedExam) return;
+    try {
+      const response = await getHallSeating(selectedHall, selectedExam);
+      setHallSeating(response.data);
+    } catch (error) {
+      toast.error("Error loading hall seating");
+    }
+  };
+
+  const handleSearch = async () => {
+    if (!searchRollNo || !selectedExam) {
+      toast.error("Please enter roll number and select exam");
+      return;
+    }
+
+    try {
+      const response = await getStudentSeat(searchRollNo, selectedExam);
+      setStudentSeat(response.data.allocation);
+      toast.success("Student seat found");
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        toast.error("Student seat not found");
+      } else {
+        toast.error("Error searching student");
+      }
+      setStudentSeat(null);
+    }
+  };
+
+  const handleExport = (type: "excel" | "pdf") => {
+    if (!selectedExam) {
+      toast.error("Please select an exam");
+      return;
+    }
+
+    const url =
+      type === "excel"
+        ? exportToExcel(selectedExam)
+        : exportToPDF(selectedExam);
+    const token = localStorage.getItem("token");
+
+    fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.blob())
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `seating-plan-${selectedExam}.${
+          type === "excel" ? "xlsx" : "pdf"
+        }`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        toast.success(`Exported to ${type.toUpperCase()}`);
+      })
+      .catch(() => toast.error("Export failed"));
+  };
+
+  return (
+    <div className="container">
+      <div className="card">
+        <h2>Seating View</h2>
+
+        <div className="form-group">
+          <label>Select Exam</label>
+          <select
+            value={selectedExam || ""}
+            onChange={(e) => setSelectedExam(Number(e.target.value))}
+          >
+            <option value="">-- Select Exam --</option>
+            {exams.map((exam) => (
+              <option key={exam.id} value={exam.id}>
+                {exam.name} - {new Date(exam.exam_date).toLocaleDateString()}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {selectedExam && (
+          <div style={{ marginTop: "1rem", display: "flex", gap: "1rem" }}>
+            <button
+              className="btn btn-success"
+              onClick={() => handleExport("excel")}
+            >
+              Export to Excel
+            </button>
+            <button
+              className="btn btn-danger"
+              onClick={() => handleExport("pdf")}
+            >
+              Export to PDF
+            </button>
+          </div>
+        )}
+      </div>
+
+      {selectedExam && (
+        <div className="card">
+          <h2>Student Seat Lookup</h2>
+          <div style={{ display: "flex", gap: "1rem", alignItems: "flex-end" }}>
+            <div className="form-group" style={{ flex: 1 }}>
+              <label>Roll Number</label>
+              <input
+                type="text"
+                value={searchRollNo}
+                onChange={(e) => setSearchRollNo(e.target.value)}
+                placeholder="Enter roll number"
+              />
+            </div>
+            <button className="btn btn-primary" onClick={handleSearch}>
+              Search
+            </button>
+          </div>
+
+          {studentSeat && (
+            <div
+              style={{
+                marginTop: "1rem",
+                padding: "1rem",
+                backgroundColor: "#e8f5e9",
+                borderRadius: "4px",
+              }}
+            >
+              <h3>Student Details:</h3>
+              <p>
+                <strong>Roll Number:</strong> {studentSeat.roll_no}
+              </p>
+              <p>
+                <strong>Name:</strong> {studentSeat.student_name}
+              </p>
+              <p>
+                <strong>Hall Number:</strong> {studentSeat.hall_number}
+              </p>
+              <p>
+                <strong>Seat Number:</strong> {studentSeat.seat_number}
+              </p>
+              <p>
+                <strong>Subject:</strong>{" "}
+                {studentSeat.subject_name || studentSeat.subject_code || "N/A"}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {selectedExam && halls.length > 0 && (
+        <div className="card">
+          <h2>Hall-wise Seating</h2>
+          <div className="form-group">
+            <label>Select Hall</label>
+            <select
+              value={selectedHall || ""}
+              onChange={(e) => setSelectedHall(Number(e.target.value))}
+            >
+              <option value="">-- Select Hall --</option>
+              {halls.map((hall) => (
+                <option key={hall.id} value={hall.id}>
+                  {hall.hall_number} - {hall.allocated_seats}/
+                  {hall.seat_capacity} seats
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {hallSeating && (
+            <div style={{ marginTop: "1rem" }}>
+              <h3>Hall: {hallSeating.hall.hall_number}</h3>
+              <p>
+                Capacity: {hallSeating.hall.seat_capacity} | Allocated:{" "}
+                {hallSeating.total_allocated}
+              </p>
+
+              <table style={{ marginTop: "1rem" }}>
+                <thead>
+                  <tr>
+                    <th>Seat</th>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Subject</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {hallSeating.seats.map((seat: any) => (
+                    <tr key={seat.seat_number}>
+                      <td>{seat.seat_number}</td>
+                      <td>{seat.roll_no}</td>
+                      <td>{seat.student_name}</td>
+                      <td>{seat.department_name || "N/A"}</td>
+                      <td>{seat.subject_name || seat.subject_code || "N/A"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Seating;
+
+
+
+================================================
+FILE: frontend/src/pages/Students.tsx
+================================================
+import React, { useEffect, useState } from "react";
+import { uploadStudents, getStudents, deleteStudent } from "../services/api";
+import { toast } from "react-toastify";
+
+interface Student {
+  id: number;
+  roll_no: string;
+  student_name: string;
+  department_name: string;
+  subject_code: string;
+  subject_name: string;
+}
+
+const Students: React.FC = () => {
+  const [students, setStudents] = useState<Student[]>([]);
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    loadStudents();
+  }, []);
+
+  const loadStudents = async () => {
+    try {
+      const response = await getStudents();
+      setStudents(response.data.students);
+    } catch (error) {
+      toast.error("Error loading students");
+    }
+  };
+
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!file) {
+      toast.error("Please select a file");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const response = await uploadStudents(file);
+      toast.success(
+        `Upload completed: ${response.data.successCount} students uploaded`
+      );
+      if (response.data.errorCount > 0) {
+        toast.warning(`${response.data.errorCount} errors occurred`);
+      }
+      setFile(null);
+      loadStudents();
+    } catch (error) {
+      toast.error("Error uploading students");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this student?")) {
+      try {
+        await deleteStudent(id);
+        toast.success("Student deleted successfully");
+        loadStudents();
+      } catch (error) {
+        toast.error("Error deleting student");
+      }
+    }
+  };
+
+  return (
+    <div className="container">
+      <div className="card">
+        <h2>Student Management</h2>
+
+        <div style={{ marginBottom: "2rem" }}>
+          <h3>Upload Students (CSV/Excel)</h3>
+          <p style={{ color: "#7f8c8d", marginBottom: "1rem" }}>
+            Required columns: roll_no, student_name, department, subject_code
+          </p>
+          <form onSubmit={handleUpload}>
+            <div className="form-group">
+              <input
+                type="file"
+                accept=".csv,.xlsx,.xls"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="btn btn-success"
+              disabled={uploading}
+            >
+              {uploading ? "Uploading..." : "Upload Students"}
+            </button>
+          </form>
+        </div>
+
+        <h3>Students List ({students.length})</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Roll No</th>
+              <th>Name</th>
+              <th>Department</th>
+              <th>Subject</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {students.map((student) => (
+              <tr key={student.id}>
+                <td>{student.roll_no}</td>
+                <td>{student.student_name}</td>
+                <td>{student.department_name || "N/A"}</td>
+                <td>{student.subject_name || student.subject_code || "N/A"}</td>
+                <td>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleDelete(student.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default Students;
+
+
+
+================================================
+FILE: frontend/src/pages/Subjects.tsx
+================================================
+import React, { useEffect, useState } from "react";
+import {
+  getSubjects,
+  createSubject,
+  updateSubject,
+  deleteSubject,
+  getExams,
+} from "../services/api";
+import { toast } from "react-toastify";
+
+const Subjects: React.FC = () => {
+  const [subjects, setSubjects] = useState<any[]>([]);
+  const [exams, setExams] = useState<any[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [formData, setFormData] = useState({
+    subject_code: "",
+    subject_name: "",
+    credits: "",
+    exam_id: "",
+  });
+
+  useEffect(() => {
+    loadSubjects();
+    loadExams();
+  }, []);
+
+  const loadSubjects = async () => {
+    try {
+      const response = await getSubjects();
+      setSubjects(response.data.subjects);
+    } catch (error) {
+      toast.error("Error loading subjects");
+    }
+  };
+
+  const loadExams = async () => {
+    try {
+      const response = await getExams();
+      setExams(response.data.exams);
+    } catch (error) {
+      console.error("Error loading exams");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const data = {
+        ...formData,
+        credits: formData.credits ? parseInt(formData.credits) : null,
+        exam_id: formData.exam_id ? parseInt(formData.exam_id) : null,
+      };
+
+      if (editingId) {
+        await updateSubject(editingId, data);
+        toast.success("Subject updated successfully");
+      } else {
+        await createSubject(data);
+        toast.success("Subject created successfully");
+      }
+      setFormData({
+        subject_code: "",
+        subject_name: "",
+        credits: "",
+        exam_id: "",
+      });
+      setShowForm(false);
+      setEditingId(null);
+      loadSubjects();
+    } catch (error) {
+      toast.error("Error saving subject");
+    }
+  };
+
+  const handleEdit = (subject: any) => {
+    setFormData({
+      subject_code: subject.subject_code,
+      subject_name: subject.subject_name,
+      credits: subject.credits || "",
+      exam_id: subject.exam_id || "",
+    });
+    setEditingId(subject.id);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure?")) {
+      try {
+        await deleteSubject(id);
+        toast.success("Subject deleted successfully");
+        loadSubjects();
+      } catch (error) {
+        toast.error("Error deleting subject");
+      }
+    }
+  };
+
+  return (
+    <div className="container">
+      <div className="card">
+        <h2>Subject Management</h2>
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            setShowForm(!showForm);
+            setEditingId(null);
+            setFormData({
+              subject_code: "",
+              subject_name: "",
+              credits: "",
+              exam_id: "",
+            });
+          }}
+        >
+          {showForm ? "Cancel" : "Add New Subject"}
+        </button>
+
+        {showForm && (
+          <form onSubmit={handleSubmit} style={{ marginTop: "1rem" }}>
+            <div className="form-group">
+              <label>Subject Code</label>
+              <input
+                type="text"
+                value={formData.subject_code}
+                onChange={(e) =>
+                  setFormData({ ...formData, subject_code: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Subject Name</label>
+              <input
+                type="text"
+                value={formData.subject_name}
+                onChange={(e) =>
+                  setFormData({ ...formData, subject_name: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Credits</label>
+              <input
+                type="number"
+                value={formData.credits}
+                onChange={(e) =>
+                  setFormData({ ...formData, credits: e.target.value })
+                }
+              />
+            </div>
+            <div className="form-group">
+              <label>Exam</label>
+              <select
+                value={formData.exam_id}
+                onChange={(e) =>
+                  setFormData({ ...formData, exam_id: e.target.value })
+                }
+              >
+                <option value="">-- Optional --</option>
+                {exams.map((exam) => (
+                  <option key={exam.id} value={exam.id}>
+                    {exam.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button type="submit" className="btn btn-success">
+              {editingId ? "Update" : "Create"}
+            </button>
+          </form>
+        )}
+
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Credits</th>
+              <th>Exam</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {subjects.map((subject) => (
+              <tr key={subject.id}>
+                <td>{subject.subject_code}</td>
+                <td>{subject.subject_name}</td>
+                <td>{subject.credits || "N/A"}</td>
+                <td>{subject.exam_name || "N/A"}</td>
+                <td className="action-buttons">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => handleEdit(subject)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleDelete(subject.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default Subjects;
+
+
+
+================================================
+FILE: frontend/src/services/api.ts
+================================================
+import axios from "axios";
+
+const API_BASE_URL = "http://localhost:5000/api";
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Add token to requests
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Auth APIs
+export const login = (username: string, password: string) =>
+  api.post("/auth/login", { username, password });
+
+export const register = (username: string, password: string) =>
+  api.post("/auth/register", { username, password });
+
+// Exam APIs
+export const getExams = () => api.get("/exams");
+export const getExam = (id: number) => api.get(`/exams/${id}`);
+export const createExam = (data: any) => api.post("/exams", data);
+export const updateExam = (id: number, data: any) =>
+  api.put(`/exams/${id}`, data);
+export const deleteExam = (id: number) => api.delete(`/exams/${id}`);
+
+// Subject APIs
+export const getSubjects = () => api.get("/subjects");
+export const getSubject = (id: number) => api.get(`/subjects/${id}`);
+export const createSubject = (data: any) => api.post("/subjects", data);
+export const updateSubject = (id: number, data: any) =>
+  api.put(`/subjects/${id}`, data);
+export const deleteSubject = (id: number) => api.delete(`/subjects/${id}`);
+
+// Hall APIs
+export const getHalls = () => api.get("/halls");
+export const getHall = (id: number) => api.get(`/halls/${id}`);
+export const createHall = (data: any) => api.post("/halls", data);
+export const updateHall = (id: number, data: any) =>
+  api.put(`/halls/${id}`, data);
+export const deleteHall = (id: number) => api.delete(`/halls/${id}`);
+
+// Department APIs
+export const getDepartments = () => api.get("/departments");
+export const getDepartment = (id: number) => api.get(`/departments/${id}`);
+export const createDepartment = (data: any) => api.post("/departments", data);
+export const updateDepartment = (id: number, data: any) =>
+  api.put(`/departments/${id}`, data);
+export const deleteDepartment = (id: number) =>
+  api.delete(`/departments/${id}`);
+
+// Student APIs
+export const getStudents = () => api.get("/students");
+export const uploadStudents = (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  return api.post("/students/upload", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+export const deleteStudent = (id: number) => api.delete(`/students/${id}`);
+
+// Allocation APIs
+export const generateAllocation = (exam_id: number) =>
+  api.post("/allocation/generate", { exam_id });
+export const getAllocationStatus = (exam_id: number) =>
+  api.get(`/allocation/status/${exam_id}`);
+export const clearAllocations = (exam_id: number) =>
+  api.delete(`/allocation/clear/${exam_id}`);
+
+// Seating APIs
+export const getHallSeating = (hall_id: number, exam_id: number) =>
+  api.get(`/seating/hall/${hall_id}/${exam_id}`);
+export const getStudentSeat = (roll_no: string, exam_id: number) =>
+  api.get(`/seating/student/${roll_no}/${exam_id}`);
+export const getExamAllocations = (exam_id: number) =>
+  api.get(`/seating/exam/${exam_id}`);
+export const getHallsWithAllocations = (exam_id: number) =>
+  api.get(`/seating/halls/${exam_id}`);
+
+// Export APIs
+export const exportToExcel = (exam_id: number) => {
+  return `${API_BASE_URL}/export/excel/${exam_id}`;
+};
+export const exportToPDF = (exam_id: number) => {
+  return `${API_BASE_URL}/export/pdf/${exam_id}`;
+};
+
+export default api;
+
+
