@@ -1,6 +1,9 @@
 import pool from "../config/db.js";
 import { v4 as uuidv4 } from "uuid";
 
+/**
+ * Generate seat allocation
+ */
 export const generateAllocation = async (req, res) => {
   const { examId } = req.body;
 
@@ -13,7 +16,6 @@ export const generateAllocation = async (req, res) => {
   try {
     await client.query("BEGIN");
 
-    // 1️⃣ get exam type
     const examRes = await client.query(
       "SELECT exam_type FROM exams WHERE id = $1",
       [examId]
@@ -25,85 +27,59 @@ export const generateAllocation = async (req, res) => {
 
     const examType = examRes.rows[0].exam_type;
 
-    // 2️⃣ clear old allocation
     await client.query(
       "DELETE FROM seat_allocations WHERE exam_id = $1",
       [examId]
     );
 
-    // 3️⃣ fetch halls
     const hallsRes = await client.query(
-      `
-      SELECT id, total_benches, seats_per_bench
-      FROM halls
-      ORDER BY hall_order
-      `
+      `SELECT id, total_benches, seats_per_bench
+       FROM halls ORDER BY hall_order`
     );
 
-    // 4️⃣ fetch students
     const studentsRes = await client.query(
-      `
-      SELECT id, subject_id
-      FROM students
-      ORDER BY roll_no
-      `
+      `SELECT id, subject_id FROM students ORDER BY roll_no`
     );
 
     const students = [...studentsRes.rows];
-    let allocatedCount = 0;
     let studentIndex = 0;
+    let allocated = 0;
 
-    // 5️⃣ allocation logic
     for (const hall of hallsRes.rows) {
-      const { id: hallId, total_benches, seats_per_bench } = hall;
-
-      for (let bench = 1; bench <= total_benches; bench++) {
+      for (let bench = 1; bench <= hall.total_benches; bench++) {
         if (studentIndex >= students.length) break;
 
-        // 🔹 CAT EXAM
         if (examType === "CAT") {
-          if (seats_per_bench !== 2) {
-            throw new Error("CAT exam requires seats_per_bench = 2");
-          }
-
           const first = students[studentIndex++];
-          let secondIndex = -1;
 
-          for (let i = studentIndex; i < students.length; i++) {
-            if (students[i].subject_id !== first.subject_id) {
-              secondIndex = i;
-              break;
-            }
-          }
+          let secondIdx = students.findIndex(
+            s => s.subject_id !== first.subject_id
+          );
 
-          // seat 1
           await client.query(
             `
             INSERT INTO seat_allocations
             (id, exam_id, hall_id, bench_number, seat_position, student_id)
             VALUES ($1,$2,$3,$4,1,$5)
             `,
-            [uuidv4(), examId, hallId, bench, first.id]
+            [uuidv4(), examId, hall.id, bench, first.id]
           );
-          allocatedCount++;
+          allocated++;
 
-          // seat 2 (only if available)
-          if (secondIndex !== -1) {
-            const second = students.splice(secondIndex, 1)[0];
-
+          if (secondIdx !== -1) {
+            const second = students.splice(secondIdx, 1)[0];
             await client.query(
               `
               INSERT INTO seat_allocations
               (id, exam_id, hall_id, bench_number, seat_position, student_id)
               VALUES ($1,$2,$3,$4,2,$5)
               `,
-              [uuidv4(), examId, hallId, bench, second.id]
+              [uuidv4(), examId, hall.id, bench, second.id]
             );
-            allocatedCount++;
+            allocated++;
           }
         }
 
-        // 🔹 END SEM EXAM
         if (examType === "END_SEM") {
           const student = students[studentIndex++];
 
@@ -113,26 +89,54 @@ export const generateAllocation = async (req, res) => {
             (id, exam_id, hall_id, bench_number, seat_position, student_id)
             VALUES ($1,$2,$3,$4,1,$5)
             `,
-            [uuidv4(), examId, hallId, bench, student.id]
+            [uuidv4(), examId, hall.id, bench, student.id]
           );
-          allocatedCount++;
+          allocated++;
         }
       }
     }
 
     await client.query("COMMIT");
 
-    res.json({
-      message: "Seat allocation completed",
-      examType,
-      allocated: allocatedCount,
-      totalStudents: studentsRes.rows.length
-    });
+    res.json({ message: "Allocation done", allocated });
   } catch (err) {
     await client.query("ROLLBACK");
-    console.error(err);
     res.status(500).json({ error: err.message });
   } finally {
     client.release();
   }
+};
+
+/**
+ * Clear allocation
+ */
+export const clearAllocation = async (req, res) => {
+  const { examId } = req.params;
+
+  await pool.query(
+    "DELETE FROM seat_allocations WHERE exam_id = $1",
+    [examId]
+  );
+
+  res.json({ message: "Allocation cleared" });
+};
+
+/**
+ * Allocation status
+ */
+export const getStatus = async (req, res) => {
+  const { examId } = req.params;
+
+  const result = await pool.query(
+    `
+    SELECT
+      COUNT(*) AS allocated,
+      (SELECT COUNT(*) FROM students) AS total
+    FROM seat_allocations
+    WHERE exam_id = $1
+    `,
+    [examId]
+  );
+
+  res.json(result.rows[0]);
 };
